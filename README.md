@@ -31,6 +31,7 @@ O sistema segue:
 - Arquitetura orientada a eventos (Event-Driven)
 
 ### 📐 Visão geral
+```
 Cliente
 ↓
 Nginx (Load Balancer)
@@ -46,7 +47,7 @@ Spring Boot API (múltiplas instâncias)
 └── RabbitMQ (mensageria)
 ↓
 Workers (processamento assíncrono)
-
+```
 
 ---
 
@@ -182,13 +183,13 @@ Workers (processamento assíncrono)
 ---
 
 ## 📂 Estrutura do Projeto
+```
 src/main/java/com/ticketscale
-
 ├── domain
 ├── application
 ├── infrastructure
 ├── interfaces
-
+```
 ---
 
 ## 🛠️ Roadmap (Próximos Passos)
