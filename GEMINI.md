@@ -11,11 +11,14 @@
 
 ## Building and Running
 
-*Note: The project is currently in its initial setup phase. Build and run commands will be updated as the implementation progresses.*
+*Requer JDK 25 instalado. O Gradle Wrapper (`./gradlew`) está incluído no projeto.*
 
-- **Build:** `TODO: Add build command (e.g., ./mvnw clean install or ./gradlew build)`
-- **Run API:** `TODO: Add run command (e.g., ./mvnw spring-boot:run or ./gradlew bootRun)`
-- **Tests:** `TODO: Add test command (e.g., ./mvnw test or ./gradlew test)`
+*Configure o `JAVA_HOME` no arquivo `gradle.properties` ou via variável de ambiente.*
+
+- **Infraestrutura:** `docker compose up -d` (PostgreSQL, Redis, RabbitMQ)
+- **Build:** `JAVA_HOME=/caminho/para/jdk25 ./gradlew build`
+- **Run API:** `JAVA_HOME=/caminho/para/jdk25 ./gradlew bootRun`
+- **Tests:** `JAVA_HOME=/caminho/para/jdk25 ./gradlew test`
 
 ## Development Conventions
 
@@ -38,5 +41,12 @@
 ## Key Files & Directories
 
 - `README.md`: High-level project documentation, architecture diagrams, and roadmap.
-- `src/main/java/com/ticketscale`: (Planned) Root package for the implementation.
 - `GEMINI.md`: This file, providing context and instructions for AI-assisted development.
+- `build.gradle`: Configuração de dependências e plugins (Gradle).
+- `docker-compose.yml`: Infraestrutura local (PostgreSQL, Redis, RabbitMQ).
+- `src/main/java/com/ticketscale/`: Root package com as camadas:
+    - `domain/`: Entidades, value objects e regras de negócio.
+    - `application/`: Casos de uso e portas.
+    - `infrastructure/`: Implementações técnicas (JPA, Redis, RabbitMQ).
+    - `interfaces/`: Controllers REST e DTOs.
+- `src/main/resources/application.yml`: Configuração do Spring Boot.

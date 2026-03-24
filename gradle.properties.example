@@ -1,0 +1,3 @@
+# Configure o caminho do JDK 25 na sua máquina local.
+# Exemplo: org.gradle.java.home=/usr/lib/jvm/java-25
+# org.gradle.java.home=/caminho/para/seu/jdk25
