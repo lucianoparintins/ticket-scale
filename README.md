@@ -54,7 +54,7 @@ Workers (processamento assíncrono)
 ## 🧰 Tecnologias
 
 ### Backend
-- Java 21
+- Java 25
 - Spring Boot
 - Spring Security (JWT)
 

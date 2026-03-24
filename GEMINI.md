@@ -4,7 +4,7 @@
 
 **TicketScale** is a SaaS platform for online ticket sales and management, designed to handle high concurrency while preventing overselling. The system ensures consistency and scalability through a robust architectural stack.
 
-- **Primary Technologies:** Java 21, Spring Boot, Spring Security (JWT).
+- **Primary Technologies:** Java 25, Spring Boot, Spring Security (JWT).
 - **Persistence & Cache:** PostgreSQL for transactional data, Redis for caching and distributed locking.
 - **Messaging:** RabbitMQ for asynchronous event processing.
 - **Architecture:** Clean Architecture, Domain-Driven Design (DDD), and Event-Driven Architecture.
