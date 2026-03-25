@@ -1,5 +1,5 @@
 package com.ticketscale.infrastructure.security;
-
+import com.ticketscale.application.ports.LockManager;
 import com.ticketscale.domain.usuario.Papel;
 import com.ticketscale.domain.usuario.Usuario;
 import com.ticketscale.infrastructure.persistence.UsuarioJpaRepository;
@@ -30,6 +30,9 @@ class SegurancaTest {
 
     @MockitoBean
     private UsuarioJpaRepository repository;
+
+    @MockitoBean
+    private LockManager lockManager;
 
     @Test
     @DisplayName("Deve retornar 403 quando acessar endpoint protegido sem token")
