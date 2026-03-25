@@ -37,5 +37,11 @@ spring:
       name: admin
       password: admin
 
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:12345678}
+
+
 server:
   port: 8080
