@@ -23,6 +23,11 @@
 ## Development Conventions
 
 - **Java 25:** Utilize as novidades e recursos mais recentes do Java 25 (e.g., Virtual Threads, Pattern Matching aprimorado, Scoped Values, Structured Concurrency, etc.) sempre que possível para garantir um código moderno e eficiente.
+- **Estratégia de Testes:**
+    - **Unitários:** Devem ser feitos com JUnit 5 e Mockito para as camadas de `domain`, `application` e serviços de infraestrutura puros.
+    - **Interfaces (Controllers):** Devem ser testados usando `@WebMvcTest` e `MockMvc`. Na versão 4.0.4, as anotações e autoconfigurações estão em pacotes modulares como `org.springframework.boot.webmvc.test.autoconfigure`.
+    - **Integração:** Devem usar `@SpringBootTest` com banco de dados **H2 em memória** (configurado em `src/test/resources/application.yml`).
+    - **Injeção de Mocks:** Utilize `@MockitoBean` em vez de `@MockBean` para compatibilidade com as versões mais recentes do Spring Boot.
 - **Idioma do Código:** Todo o código (nomes de variáveis, classes, métodos, etc.) deve ser escrito em **Português (pt-br)**, visando clareza e padronização dentro do contexto do projeto.
 - **Architectural Layers:** The project follows Clean Architecture with a clear separation of concerns:
     - `domain`: Core business logic and rules.

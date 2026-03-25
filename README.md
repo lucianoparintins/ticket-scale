@@ -194,7 +194,7 @@ src/main/java/com/ticketscale
 
 ## 🛠️ Roadmap (Próximos Passos)
 
-- [ ] Módulo de autenticação (JWT)
+- [x] Módulo de autenticação (JWT) e testes automatizados
 - [ ] CRUD de eventos
 - [ ] Sistema de reserva com Redis
 - [ ] Integração com RabbitMQ
