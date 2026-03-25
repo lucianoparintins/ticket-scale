@@ -7,6 +7,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Hashing de senhas com Argon2id:
+  - Interface `PasswordHasher` na camada de domínio.
+  - Implementação `Argon2PasswordHasher` na camada de infraestrutura (Argon2id, iterations=3, memory=64MB, parallelism=1).
+  - Suporte a PEPPER via variável de ambiente `PASSWORD_PEPPER`.
+  - Integração nativa com Spring Security (`Argon2PasswordHasher` implementa `PasswordEncoder`).
+  - Testes unitários para o novo mecanismo de hash (`Argon2PasswordHasherTest`).
 - Documentação de análise inicial do projeto e roadmap estratégico em `docs/analise_projeto_inicial.md`.
 - Configuração de perfis de aplicação:
   - `application.yml`: Configurações comuns e ativação do perfil `dev` por padrão.

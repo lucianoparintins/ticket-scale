@@ -57,6 +57,7 @@ Workers (processamento assíncrono)
 - Java 25
 - Spring Boot
 - Spring Security (JWT)
+- Argon2id (`de.mkammerer:argon2-jvm`)
 
 ### Banco de Dados
 - PostgreSQL
@@ -91,8 +92,9 @@ Workers (processamento assíncrono)
 ## 📋 Requisitos Funcionais
 
 ### Autenticação
-- cadastro de usuários
-- login com JWT
+- cadastro de usuários com hashing Argon2id
+- login com JWT e verificação de hash
+- uso de PEPPER em todas as operações de senha
 - controle de acesso por perfil
 
 ### Eventos
@@ -131,6 +133,8 @@ Workers (processamento assíncrono)
 
 ### Segurança
 - autenticação via JWT
+- hashing de senhas robusto com Argon2id
+- proteção contra ataques de dicionário e rainbow tables via PEPPER
 - proteção de dados sensíveis
 
 ### Consistência
@@ -177,6 +181,10 @@ Workers (processamento assíncrono)
 - autenticação stateless
 - escalabilidade horizontal
 
+### Argon2id
+- hashing de senhas moderno e resistente a ataques por hardware (GPUs/ASICs)
+- configurado com PEPPER para camada extra de segurança
+
 ### PostgreSQL
 - consistência transacional
 
@@ -203,14 +211,18 @@ src/main/java/com/ticketscale
     ```bash
     docker compose up -d
     ```
-2.  **Aplicação:** Inicie a API (perfil `dev` ativo por padrão):
+2.  **Variáveis de Ambiente:** Defina o pepper (opcional no dev, obrigatório no prod):
+    ```bash
+    export PASSWORD_PEPPER=meu_pepper_secreto
+    ```
+3.  **Aplicação:** Inicie a API (perfil `dev` ativo por padrão):
     ```bash
     ./gradlew bootRun
     ```
 
 ### Perfis de Ambiente
 - **dev (padrão):** Configurado para uso local com containers Docker.
-- **prod:** Requer variáveis de ambiente (`DB_URL`, `REDIS_HOST`, etc.).
+- **prod:** Requer variáveis de ambiente (`DB_URL`, `REDIS_HOST`, `PASSWORD_PEPPER`, etc.).
 - **test:** Usado automaticamente durante a execução de `./gradlew test` (usa banco H2 em memória).
 
 ---
@@ -218,6 +230,7 @@ src/main/java/com/ticketscale
 ## 🛠️ Roadmap (Próximos Passos)
 
 - [x] Módulo de autenticação (JWT) e testes automatizados
+- [x] Hashing de senhas seguro com Argon2id
 - [ ] CRUD de eventos
 - [ ] Sistema de reserva com Redis
 - [ ] Integração com RabbitMQ
