@@ -192,6 +192,29 @@ src/main/java/com/ticketscale
 ```
 ---
 
+## ⚙️ Configuração e Execução
+
+### Pré-requisitos
+- JDK 25 instalado.
+- Docker e Docker Compose instalados.
+
+### Passos para rodar em Desenvolvimento
+1.  **Infraestrutura:** Suba o banco, cache e mensageria:
+    ```bash
+    docker compose up -d
+    ```
+2.  **Aplicação:** Inicie a API (perfil `dev` ativo por padrão):
+    ```bash
+    ./gradlew bootRun
+    ```
+
+### Perfis de Ambiente
+- **dev (padrão):** Configurado para uso local com containers Docker.
+- **prod:** Requer variáveis de ambiente (`DB_URL`, `REDIS_HOST`, etc.).
+- **test:** Usado automaticamente durante a execução de `./gradlew test` (usa banco H2 em memória).
+
+---
+
 ## 🛠️ Roadmap (Próximos Passos)
 
 - [x] Módulo de autenticação (JWT) e testes automatizados

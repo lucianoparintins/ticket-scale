@@ -40,6 +40,11 @@
 
 ## Fluxo de Trabalho e Git
 
+- **Workflow de Commit (Obrigatório):** Antes de realizar qualquer commit, você DEVE:
+    1. Validar as alterações rodando a suíte de testes: `JAVA_HOME=/home/luke/dev/java/jdk25 ./gradlew test`.
+    2. Atualizar o arquivo `CHANGELOG.md` com as novas implementações ou correções.
+    3. Revisar e atualizar o `README.md` caso novos módulos sejam concluídos ou o roadmap mude.
+    4. Revisar e atualizar este arquivo (`GEMINI.md`) caso novas convenções ou tecnologias sejam adicionadas.
 - **Commits Locais:** Realize commits apenas no repositório local.
 - **Mensagens de Commit:** Devem ser escritas em **Português (pt-br)**.
 - **Git Push:** **Não** execute `git push` para repositórios remotos sem autorização explícita do usuário.
