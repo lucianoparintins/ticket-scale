@@ -7,6 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Sistema de Reserva de Ingressos com Redis:
+  - Entidades de domínio: `Ingresso`, `Lote`, `Reserva` com enums `StatusIngresso` e `StatusReserva`.
+  - Repositórios de domínio: `IngressoRepository`, `LoteRepository`, `ReservaRepository`.
+  - Interface `LockManager` na camada de aplicação (porta para lock distribuído).
+  - `ReservarIngressoUseCase` na camada de aplicação com lock distribuído via Redis.
+  - `RedisLockManager` na camada de infraestrutura (implementação do `LockManager` com `RedisTemplate`).
+  - `ReservaController` com endpoint para criar reservas.
+  - DTOs: `ReservaRequestDTO` e `ReservaResponseDTO`.
+  - Testes unitários para `ReservarIngressoUseCase`, `Ingresso` e `Reserva`.
+  - Teste de controller para `ReservaController` com `@WebMvcTest`.
+  - Teste de integração `ReservarIngressoIntegrationTest` com `@SpringBootTest`.
 - Módulo de CRUD de Eventos:
   - Entidade `Evento` e Value Object `PeriodoEvento` na camada de domínio.
   - Interface `EventoRepository` e implementação JPA na infraestrutura.

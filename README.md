@@ -232,7 +232,7 @@ src/main/java/com/ticketscale
 - [x] Módulo de autenticação (JWT) e testes automatizados
 - [x] Hashing de senhas seguro com Argon2id
 - [x] CRUD de eventos (Admin e Cliente)
-- [ ] Sistema de reserva com Redis
+- [x] Sistema de reserva com Redis
 - [ ] Integração com RabbitMQ
 - [ ] Worker de processamento
 - [ ] Dashboard administrativo
