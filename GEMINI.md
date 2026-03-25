@@ -22,6 +22,7 @@
 
 ## Development Conventions
 
+- **Java 25:** Utilize as novidades e recursos mais recentes do Java 25 (e.g., Virtual Threads, Pattern Matching aprimorado, Scoped Values, Structured Concurrency, etc.) sempre que possível para garantir um código moderno e eficiente.
 - **Idioma do Código:** Todo o código (nomes de variáveis, classes, métodos, etc.) deve ser escrito em **Português (pt-br)**, visando clareza e padronização dentro do contexto do projeto.
 - **Architectural Layers:** The project follows Clean Architecture with a clear separation of concerns:
     - `domain`: Core business logic and rules.
