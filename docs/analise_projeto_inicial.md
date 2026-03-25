@@ -79,7 +79,7 @@ A **Fase 1 (Scaffolding)** é o ponto de partida obrigatório. Sem ela, não há
 ### Decisão necessária do usuário:
 
 > [!IMPORTANT]
-> **Maven ou Gradle?** — O [GEMINI.md](file:///home/luke/dev/workspace/github.com/lucianoparintins/ticket-scale/GEMINI.md) menciona ambos como possibilidades. É preciso definir qual ferramenta de build usar.
+> **Maven ou Gradle?** — O [GEMINI.md] menciona ambos como possibilidades. É preciso definir qual ferramenta de build usar.
 
 > [!IMPORTANT]
 > **Spring Initializr ou scaffolding manual?** — Podemos usar `curl` no [start.spring.io](https://start.spring.io) para gerar o projeto automaticamente, ou criar os arquivos manualmente.
