@@ -7,6 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Documentação de análise inicial do projeto e roadmap estratégico em `docs/analise_projeto_inicial.md`.
 - Configuração de perfis de aplicação:
   - `application.yml`: Configurações comuns e ativação do perfil `dev` por padrão.
   - `application-dev.yml`: Configurações locais (PostgreSQL, Redis, RabbitMQ em localhost).
