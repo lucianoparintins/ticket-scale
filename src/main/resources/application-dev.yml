@@ -1,0 +1,29 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # --- Banco de Dados Local ---
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticketscale
+    username: ticketscale
+    password: ticketscale
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # --- Redis Local ---
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # --- RabbitMQ Local ---
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ticketscale
+    password: ticketscale
