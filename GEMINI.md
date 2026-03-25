@@ -62,8 +62,8 @@
 - `build.gradle`: Configuração de dependências e plugins (Gradle).
 - `docker-compose.yml`: Infraestrutura local (PostgreSQL, Redis, RabbitMQ).
 - `src/main/java/com/ticketscale/`: Root package com as camadas:
-    - `domain/`: Entidades, value objects, repositórios e `PasswordHasher`.
-    - `application/`: Casos de uso e portas.
-    - `infrastructure/`: Implementações técnicas (JPA, Redis, RabbitMQ, `Argon2PasswordHasher`).
-    - `interfaces/`: Controllers REST e DTOs.
+    - `domain/`: Entidades (`Usuario`, `Evento`), value objects (`PeriodoEvento`), repositórios e `PasswordHasher`.
+    - `application/`: Casos de uso e portas (`EventoService`, `AutenticacaoService`).
+    - `infrastructure/`: Implementações técnicas (JPA para `Usuario` e `Evento`, Redis, RabbitMQ, `Argon2PasswordHasher`).
+    - `interfaces/`: Controllers REST (`AutenticacaoController`, `UsuarioController`, `EventoController`) e DTOs.
 - `src/main/resources/application.yml`: Configuração do Spring Boot.

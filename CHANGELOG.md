@@ -7,6 +7,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Módulo de CRUD de Eventos:
+  - Entidade `Evento` e Value Object `PeriodoEvento` na camada de domínio.
+  - Interface `EventoRepository` e implementação JPA na infraestrutura.
+  - `EventoService` na camada de aplicação para orquestrar as operações de negócio.
+  - `EventoController` com endpoints para criar, listar, detalhar e desativar eventos.
+  - Controle de acesso por perfil: criação e remoção restritas a `ROLE_ADMIN`.
+  - Testes unitários para `EventoService` e `EventoController`.
 - Hashing de senhas com Argon2id:
   - Interface `PasswordHasher` na camada de domínio.
   - Implementação `Argon2PasswordHasher` na camada de infraestrutura (Argon2id, iterations=3, memory=64MB, parallelism=1).
