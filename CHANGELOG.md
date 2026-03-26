@@ -7,6 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Plano de implementação da tecnologia de Pagamentos (`docs/implementation_plan_pagamentos.md`) revisado e adequado aos princípios de Clean Architecture, DDD, SOLID e concorrência (lock distribuído).
 - Habilitação de Virtual Threads do Java 25 no Spring Boot (`spring.threads.virtual.enabled: true`).
 - Integração com RabbitMQ (Fase 5):
   - Porta `EventPublisher` na camada de aplicação.

@@ -7,7 +7,7 @@ Implementar o fluxo de pagamento de ingressos no TicketScale, seguindo Clean Arc
 ## Avaliação do Plano Original
 
 > [!NOTE]
-> O plano original apresentava uma boa visão geral, mas continha **7 problemas** que violam Clean Code, DDD, SOLID, DRY e KISS. As correções estão incorporadas neste documento revisado.
+> O plano original apresentava uma boa visão geral, mas continha **10 problemas** que violam Clean Code, DDD, SOLID, DRY e KISS. As correções estão incorporadas neste documento revisado.
 
 | # | Problema Identificado | Princípio Violado | Correção |
 |---|---|---|---|
@@ -18,6 +18,9 @@ Implementar o fluxo de pagamento de ingressos no TicketScale, seguindo Clean Arc
 | 5 | Falta de **exceções de domínio** — usa `RuntimeException` e `IllegalArgumentException` genéricas | **DDD / Clean Code** | Criar `PagamentoException`, `ReservaNaoEncontradaException`, `MetodoNaoSuportadoException` no domínio |
 | 6 | `PagamentoControllerTest` espera `200` para criação de recurso | **REST / Clean Code** | Corrigir para `201 Created` com header `Location` |
 | 7 | Falta validação de **idempotência** — pagamento duplicado para mesma reserva | **DDD / Integridade** | Adicionar check `pagamentoRepository.existsByReservaIdAndStatus(reservaId, APROVADO)` antes de processar |
+| 8 | Falta **lock distribuído** no `ProcessarPagamentoUseCase` — condição de corrida entre verificação de idempotência e processamento | **Concorrência / Integridade** | Adicionar `LockManager.acquireLock("lock:pagamento:reserva:" + reservaId)` seguindo o padrão do `ReservarIngressoUseCase` |
+| 9 | Navegação `reserva → ingresso → lote` com `FetchType.LAZY` causa **N+1 queries** | **Performance** | Criar query `JOIN FETCH` dedicada no `ReservaRepository` para buscar reserva com ingresso e lote em uma única query |
+| 10 | Falta mapeamento de **exceções de domínio → HTTP status codes** — sem `@RestControllerAdvice` | **REST / Clean Code** | Criar `PagamentoExceptionHandler` com `@RestControllerAdvice` para traduzir exceções em respostas HTTP adequadas |
 
 ---
 
@@ -39,6 +42,7 @@ O que falta é o **caso de uso** que orquestra o pagamento e a **infraestrutura*
 graph TD
     subgraph interfaces
         PC[PagamentoController]
+        PEH[PagamentoExceptionHandler]
     end
 
     subgraph application
@@ -46,6 +50,7 @@ graph TD
         GP["«interface» GatewayPagamento"]
         GPR["«interface» GatewayPagamentoResolver"]
         EP["«interface» EventPublisher"]
+        LM["«interface» LockManager"]
     end
 
     subgraph domain
@@ -64,10 +69,12 @@ graph TD
         MDeb[MockGatewayCartaoDebito]
         MCred[MockGatewayCartaoCredito]
         RMQ[RabbitMQEventPublisher]
+        RLM[RedisLockManager]
     end
 
     PC --> UC
     UC --> GPR
+    UC --> LM
     GPR --> GP
     UC --> R
     UC --> EP
@@ -76,6 +83,8 @@ graph TD
     GP -.-> MCred
     GPR -.-> GPRI
     EP -.-> RMQ
+    LM -.-> RLM
+    PEH -.-> EX
 ```
 
 ### Princípios Aplicados
@@ -180,7 +189,32 @@ public interface PagamentoRepository {
 #### [NEW] `PagamentoConfirmadoEvent.java`
 **Pacote:** `domain.event`
 
-Record evento de domínio: `reservaId`, `pagamentoId`, `valor`, `metodoPagamento`
+Evento de domínio que registra a confirmação de um pagamento:
+
+```java
+public class PagamentoConfirmadoEvent {
+    private final String reservaId;
+    private final String pagamentoId;
+    private final String valor;
+    private final String metodoPagamento;
+
+    public PagamentoConfirmadoEvent(String reservaId, String pagamentoId,
+                                     String valor, String metodoPagamento) {
+        this.reservaId = reservaId;
+        this.pagamentoId = pagamentoId;
+        this.valor = valor;
+        this.metodoPagamento = metodoPagamento;
+    }
+
+    public String getReservaId() { return reservaId; }
+    public String getPagamentoId() { return pagamentoId; }
+    public String getValor() { return valor; }
+    public String getMetodoPagamento() { return metodoPagamento; }
+}
+```
+
+> [!NOTE]
+> **Padronização com `ReservaCriadaEvent`**: Usa `String` para IDs (ao invés de `UUID`) e classe com getters manuais para manter consistência com o evento de domínio existente. A serialização JSON para RabbitMQ fica uniforme entre todos os eventos. Uma migração futura para records pode ser feita como refactoring transversal.
 
 #### [NEW] `PagamentoException.java`
 **Pacote:** `domain.pagamento`
@@ -256,21 +290,38 @@ Record: `sucesso (boolean)`, `transacaoExternaId (String)`, `mensagemErro (Strin
 #### [NEW] `ProcessarPagamentoUseCase.java`
 **Pacote:** `application.usecase`
 
-Caso de uso que orquestra o fluxo:
+Caso de uso que orquestra o fluxo com **lock distribuído** para evitar condições de corrida:
 
-1. Busca a `Reserva` por ID e valida estado (`PENDENTE` + não expirada)
-2. **Verifica idempotência**: se já existe pagamento `APROVADO` para esta reserva → lança `PagamentoDuplicadoException`
-3. Obtém o valor do `Lote` associado ao `Ingresso` da reserva
-4. Cria a entidade `Pagamento` com status `PENDENTE` e `MetodoPagamento`
-5. Usa `GatewayPagamentoResolver.resolver(metodo)` para obter o gateway correto
-6. Chama `gateway.processarPagamento(solicitacao)`
-7. Se sucesso → `pagamento.confirmar()`, `reserva.confirmarPagamento()`, salva ambos, publica evento
-8. Se falha → `pagamento.recusar()`, salva, lança `PagamentoRecusadoException`
-9. Tudo em `@Transactional` para consistência
+1. **Adquire lock distribuído** via `LockManager.acquireLock("lock:pagamento:reserva:" + reservaId, 10)` — se não conseguir, lança exceção (padrão idêntico ao `ReservarIngressoUseCase`)
+2. Busca a `Reserva` por ID **com `JOIN FETCH`** (ingresso + lote) para evitar N+1 queries e valida estado (`PENDENTE` + não expirada)
+3. **Verifica idempotência**: se já existe pagamento `APROVADO` para esta reserva → lança `PagamentoDuplicadoException`
+4. Obtém o valor do `Lote` via `reserva.getIngresso().getLote().getPreco()` (já carregado pelo JOIN FETCH)
+5. Cria a entidade `Pagamento` com status `PENDENTE` e `MetodoPagamento`
+6. Usa `GatewayPagamentoResolver.resolver(metodo)` para obter o gateway correto
+7. Chama `gateway.processarPagamento(solicitacao)`
+8. Se sucesso → `pagamento.confirmar()`, `reserva.confirmarPagamento()`, salva ambos, publica evento
+9. Se falha → `pagamento.recusar()`, salva, lança `PagamentoRecusadoException`
+10. **Libera lock** no bloco `finally` (garante liberação mesmo em caso de exceção)
+11. Tudo em `@Transactional` para consistência
+
+> [!IMPORTANT]
+> **Lock distribuído (Redis):** Segue o mesmo padrão do `ReservarIngressoUseCase` — o lock é adquirido **antes** da transação e liberado no `finally`. Isso garante que apenas uma requisição por reserva seja processada por vez, eliminando a race condition entre a verificação de idempotência (`SELECT`) e o processamento (`INSERT`).
 
 #### [MODIFY] `EventPublisher.java`
 
 Adicionar método `publicarPagamentoConfirmado(PagamentoConfirmadoEvent evento)`
+
+#### [MODIFY] `ReservaRepository.java`
+
+Adicionar query com `JOIN FETCH` para evitar N+1 ao buscar reserva com ingresso e lote:
+
+```java
+@Query("SELECT r FROM Reserva r JOIN FETCH r.ingresso i JOIN FETCH i.lote WHERE r.id = :id")
+Optional<Reserva> buscarComIngressoELotePorId(@Param("id") UUID id);
+```
+
+> [!NOTE]
+> **Motivação:** Os relacionamentos `Reserva → Ingresso` e `Ingresso → Lote` são `FetchType.LAZY`. Sem o `JOIN FETCH`, a navegação `reserva.getIngresso().getLote().getPreco()` no `ProcessarPagamentoUseCase` geraria **3 queries separadas** (N+1). Com essa query, tudo é carregado numa única ida ao banco.
 
 ---
 
@@ -369,6 +420,69 @@ Adicionar fila `ticketscale.payments.confirmed` e binding com routing key `pagam
 
 ---
 
+### Interfaces Layer — Exception Handling
+
+#### [NEW] `PagamentoExceptionHandler.java`
+**Pacote:** `interfaces.rest.pagamento`
+
+`@RestControllerAdvice` que traduz exceções de domínio em respostas HTTP adequadas:
+
+```java
+@RestControllerAdvice
+public class PagamentoExceptionHandler {
+
+    @ExceptionHandler(ReservaNaoEncontradaException.class)
+    public ResponseEntity<ErroResponseDTO> handleReservaNaoEncontrada(ReservaNaoEncontradaException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ErroResponseDTO(ex.getMessage(), "RESERVA_NAO_ENCONTRADA"));
+    }
+
+    @ExceptionHandler(PagamentoDuplicadoException.class)
+    public ResponseEntity<ErroResponseDTO> handlePagamentoDuplicado(PagamentoDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(new ErroResponseDTO(ex.getMessage(), "PAGAMENTO_DUPLICADO"));
+    }
+
+    @ExceptionHandler(MetodoNaoSuportadoException.class)
+    public ResponseEntity<ErroResponseDTO> handleMetodoNaoSuportado(MetodoNaoSuportadoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErroResponseDTO(ex.getMessage(), "METODO_NAO_SUPORTADO"));
+    }
+
+    @ExceptionHandler(PagamentoRecusadoException.class)
+    public ResponseEntity<ErroResponseDTO> handlePagamentoRecusado(PagamentoRecusadoException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .body(new ErroResponseDTO(ex.getMessage(), "PAGAMENTO_RECUSADO"));
+    }
+
+    @ExceptionHandler(PagamentoException.class)
+    public ResponseEntity<ErroResponseDTO> handlePagamentoGenerico(PagamentoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErroResponseDTO(ex.getMessage(), "ERRO_PAGAMENTO"));
+    }
+}
+```
+
+#### [NEW] `ErroResponseDTO.java`
+**Pacote:** `interfaces.rest.pagamento`
+
+Record padronizado para respostas de erro:
+
+```java
+public record ErroResponseDTO(
+    String mensagem,
+    String codigo
+) {}
+```
+
+| Exceção de Domínio | HTTP Status | Código |
+|---|---|---|
+| `ReservaNaoEncontradaException` | `404 Not Found` | `RESERVA_NAO_ENCONTRADA` |
+| `PagamentoDuplicadoException` | `409 Conflict` | `PAGAMENTO_DUPLICADO` |
+| `MetodoNaoSuportadoException` | `400 Bad Request` | `METODO_NAO_SUPORTADO` |
+| `PagamentoRecusadoException` | `422 Unprocessable Entity` | `PAGAMENTO_RECUSADO` |
+| `PagamentoException` (genérica) | `400 Bad Request` | `ERRO_PAGAMENTO` |
+
 ### Interfaces Layer
 
 #### [NEW] `PagamentoController.java`
@@ -414,6 +528,9 @@ Record: `chavePix (String)`
 
 Record: `numeroCartao`, `nomeTitular`, `validade`, `cvv`, `parcelas`
 
+> [!WARNING]
+> **Segurança PCI-DSS:** Na versão mock este DTO recebe dados de cartão diretamente. Em **produção**, dados sensíveis (`numeroCartao`, `cvv`) **nunca devem trafegar pelo backend**. O frontend deve usar tokenização via SDK do gateway (ex: Stripe.js, MercadoPago SDK) e enviar apenas o token. O DTO de produção deve receber `tokenCartao (String)` ao invés dos campos brutos.
+
 #### [NEW] `PagamentoResponseDTO.java`
 **Pacote:** `interfaces.rest.pagamento`
 
@@ -431,6 +548,19 @@ Record: `pagamentoId`, `reservaId`, `valor`, `status`, `metodoPagamento`, `trans
 
 > [!IMPORTANT]
 > **Parcelas no Crédito**: O plano prevê campo `parcelas` apenas no `CARTAO_CREDITO`. Há algum limite máximo de parcelas desejado (ex: 12x)? Ou isso será definido por evento/lote?
+
+---
+
+## Débitos Técnicos Identificados
+
+> [!NOTE]
+> Os itens abaixo são inconsistências pré-existentes no projeto que **não bloqueiam** a implementação do pagamento, mas devem ser endereçados em refactorings futuros.
+
+| # | Débito | Impacto | Sugestão |
+|---|---|---|---|
+| 1 | **Pacotes `port/` vs `ports/`**: A camada `application` possui duas convenções — `application.port.out` (contém `EventPublisher`) e `application.ports` (contém `LockManager`). | Confusão para novos desenvolvedores; quebra de padronização | Unificar em `application.port.out` e mover `LockManager` no mesmo refactoring |
+| 2 | **`ReservaCriadaEvent` usa classe tradicional com `String`**: Enquanto Java 25 favorece records, e os IDs do domínio são `UUID` | Inconsistência de estilo e tipo | Migrar para record com `UUID` em refactoring transversal de eventos |
+| 3 | **Repositórios do domínio estendem `JpaRepository`**: `ReservaRepository`, `IngressoRepository`, `LoteRepository` acoplam domínio ao Spring Data | Viola DIP / Clean Architecture | Aplicar o padrão de interface pura (como `PagamentoRepository`) retroativamente |
 
 ---
 
@@ -455,15 +585,16 @@ Record: `pagamentoId`, `reservaId`, `valor`, `status`, `metodoPagamento`, `trans
 - Verificar sealed: `DadosMetodoPagamento`é `DadosPix` ou `DadosCartao` (pattern matching)
 
 #### 3. `ProcessarPagamentoUseCaseTest` — Application
-- Mock de `GatewayPagamentoResolver`, `ReservaRepository`, `PagamentoRepository`, `EventPublisher`
-- Cenário sucesso via **PIX** → reserva confirmada, pagamento aprovado, evento publicado
+- Mock de `GatewayPagamentoResolver`, `ReservaRepository`, `PagamentoRepository`, `EventPublisher`, `LockManager`
+- Cenário sucesso via **PIX** → lock adquirido, reserva confirmada, pagamento aprovado, evento publicado, lock liberado
 - Cenário sucesso via **CARTAO_DEBITO** → parcelas = 1 validado
 - Cenário sucesso via **CARTAO_CREDITO** → parcelas > 1 aceito
-- Cenário falha: gateway retorna falha → pagamento recusado, `PagamentoRecusadoException`
-- Cenário reserva expirada → `PagamentoException`
-- Cenário reserva inexistente → `ReservaNaoEncontradaException`
-- Cenário método não suportado → `MetodoNaoSuportadoException` do Resolver
-- **Cenário idempotência**: reserva já tem pagamento `APROVADO` → `PagamentoDuplicadoException`
+- Cenário falha: gateway retorna falha → pagamento recusado, `PagamentoRecusadoException`, **lock liberado no finally**
+- Cenário reserva expirada → `PagamentoException`, lock liberado
+- Cenário reserva inexistente → `ReservaNaoEncontradaException`, lock liberado
+- Cenário método não suportado → `MetodoNaoSuportadoException` do Resolver, lock liberado
+- **Cenário idempotência**: reserva já tem pagamento `APROVADO` → `PagamentoDuplicadoException`, lock liberado
+- **Cenário lock não adquirido**: `LockManager.acquireLock()` retorna `false` → exceção lançada sem processar pagamento
 
 #### 4. `GatewayPagamentoResolverImplTest` — Infrastructure
 - Resolver com 3 gateways → retorna correto por `MetodoPagamento`
@@ -479,15 +610,25 @@ Record: `pagamentoId`, `reservaId`, `valor`, `status`, `metodoPagamento`, `trans
 - `POST /api/v1/pagamentos` com cartão crédito válido → **201 Created**
 - `POST /api/v1/pagamentos` com payload inválido (sem `metodoPagamento`) → 400
 - `POST /api/v1/pagamentos` com cartão mas sem `dadosCartao` → 400
-- `POST /api/v1/pagamentos` com reserva inexistente → 404
+- `POST /api/v1/pagamentos` com reserva inexistente → **404 Not Found** (via `PagamentoExceptionHandler`)
+- `POST /api/v1/pagamentos` com pagamento duplicado → **409 Conflict** (via `PagamentoExceptionHandler`)
+- `POST /api/v1/pagamentos` com pagamento recusado pelo gateway → **422 Unprocessable Entity** (via `PagamentoExceptionHandler`)
+
+#### 7. `PagamentoExceptionHandlerTest` — Interfaces (`@WebMvcTest`)
+- `ReservaNaoEncontradaException` → 404 com corpo `{"mensagem": "...", "codigo": "RESERVA_NAO_ENCONTRADA"}`
+- `PagamentoDuplicadoException` → 409 com corpo `{"mensagem": "...", "codigo": "PAGAMENTO_DUPLICADO"}`
+- `MetodoNaoSuportadoException` → 400 com corpo `{"mensagem": "...", "codigo": "METODO_NAO_SUPORTADO"}`
+- `PagamentoRecusadoException` → 422 com corpo `{"mensagem": "...", "codigo": "PAGAMENTO_RECUSADO"}`
+- `PagamentoException` genérica → 400 com corpo `{"mensagem": "...", "codigo": "ERRO_PAGAMENTO"}`
 
 ### Testes de Integração (`@SpringBootTest` + H2)
 
-#### 7. `ProcessarPagamentoIntegrationTest`
+#### 8. `ProcessarPagamentoIntegrationTest`
 - Fluxo completo via **PIX**: reserva pendente → pagamento → confirmada
 - Fluxo completo via **CARTAO_CREDITO**: reserva pendente → pagamento → confirmada
 - Verifica persistência no H2 e status final de `Ingresso` como `VENDIDO`
 - **Teste de idempotência**: segundo pagamento para mesma reserva → exceção
+- Verifica que query `JOIN FETCH` carrega `Ingresso` e `Lote` sem N+1 (pode validar com contagem de queries via Hibernate statistics)
 - Mock do `EventPublisher` e `LockManager` via `@MockitoBean`
 
 ### Comando para executar os testes
