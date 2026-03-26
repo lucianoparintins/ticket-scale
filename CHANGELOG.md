@@ -7,6 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Adição de exemplos de código para testes unitários, testes de controller (WebMvcTest) e de integração no `GEMINI.md`.
 - Sistema de Reserva de Ingressos com Redis:
   - Entidades de domínio: `Ingresso`, `Lote`, `Reserva` com enums `StatusIngresso` e `StatusReserva`.
   - Repositórios de domínio: `IngressoRepository`, `LoteRepository`, `ReservaRepository`.

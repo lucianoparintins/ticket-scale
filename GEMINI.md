@@ -30,8 +30,57 @@
     - O salt é gerado automaticamente pela biblioteca.
 - **Estratégia de Testes:**
     - **Unitários:** Devem ser feitos com JUnit 5 e Mockito para as camadas de `domain`, `application` e serviços de infraestrutura puros.
+      <br>*Exemplo (`application`):*
+      ```java
+      @ExtendWith(MockitoExtension.class)
+      class ReservarIngressoUseCaseTest {
+          @Mock private LockManager lockManager;
+          @InjectMocks private ReservarIngressoUseCase useCase;
+
+          @Test
+          void executar_deveReservarComSucesso_quandoLockAdquirido() {
+              when(lockManager.acquireLock(anyString(), anyInt())).thenReturn(true);
+              Reserva reservaSalva = useCase.executar(loteId, usuarioId);
+              assertNotNull(reservaSalva);
+              verify(lockManager).releaseLock(anyString());
+          }
+      }
+      ```
     - **Interfaces (Controllers):** Devem ser testados usando `@WebMvcTest` e `MockMvc`. Na versão 4.0.4, as anotações e autoconfigurações estão em pacotes modulares como `org.springframework.boot.webmvc.test.autoconfigure`.
+      <br>*Exemplo (`interfaces`):*
+      ```java
+      @WebMvcTest(ReservaController.class)
+      @AutoConfigureMockMvc(addFilters = false) // Desabilita segurança geral
+      class ReservaControllerTest {
+          @Autowired private MockMvc mockMvc;
+          @MockitoBean private ReservarIngressoUseCase reservarIngressoUseCase;
+
+          @Test
+          void reservar_deveRetornarStatus201_quandoPayloadForValido() throws Exception {
+              mockMvc.perform(post("/api/v1/reservas")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content("{\"loteId\":\"...\", \"usuarioId\":\"...\"}"))
+                      .andExpect(status().isCreated());
+          }
+      }
+      ```
     - **Integração:** Devem usar `@SpringBootTest` com banco de dados **H2 em memória** (configurado em `src/test/resources/application.yml`).
+      <br>*Exemplo de um `IntegrationTest`:*
+      ```java
+      @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+      @ActiveProfiles("test") // H2 database configurado no application-test.yml
+      public class ReservarIngressoIntegrationTest {
+          @Autowired private ReservarIngressoUseCase useCase;
+          @MockitoBean private LockManager lockManager; // Injeta fake para dependência externa
+          @Autowired private ReservaRepository reservaRepository;
+
+          @Test
+          void executar_deveGravarReservaNoH2_aoSucesso() { // Teste real em banco de memória
+              Reserva salva = useCase.executar(loteId, usuarioId);
+              assertTrue(reservaRepository.findById(salva.getId()).isPresent());
+          }
+      }
+      ```
     - **Injeção de Mocks:** Utilize `@MockitoBean` em vez de `@MockBean` para compatibilidade com as versões mais recentes do Spring Boot.
 - **Idioma do Código:** Todo o código (nomes de variáveis, classes, métodos, etc.) deve ser escrito em **Português (pt-br)**, visando clareza e padronização dentro do contexto do projeto.
 - **Architectural Layers:** The project follows Clean Architecture with a clear separation of concerns:
