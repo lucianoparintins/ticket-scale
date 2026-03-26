@@ -1,7 +1,11 @@
 spring:
   application:
     name: TicketScale
-  
+
+  threads:
+    virtual:
+      enabled: true
+
   profiles:
     active: dev
 

@@ -7,6 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Habilitação de Virtual Threads do Java 25 no Spring Boot (`spring.threads.virtual.enabled: true`).
 - Integração com RabbitMQ (Fase 5):
   - Porta `EventPublisher` na camada de aplicação.
   - Evento de domínio `ReservaCriadaEvent`.
