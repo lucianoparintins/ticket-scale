@@ -233,8 +233,8 @@ src/main/java/com/ticketscale
 - [x] Hashing de senhas seguro com Argon2id
 - [x] CRUD de eventos (Admin e Cliente)
 - [x] Sistema de reserva com Redis
-- [ ] Integração com RabbitMQ
-- [ ] Worker de processamento
+- [x] Integração com RabbitMQ
+- [x] Worker de processamento
 - [ ] Dashboard administrativo
 
 ---

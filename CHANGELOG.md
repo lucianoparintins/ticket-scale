@@ -7,6 +7,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Integração com RabbitMQ (Fase 5):
+  - Porta `EventPublisher` na camada de aplicação.
+  - Evento de domínio `ReservaCriadaEvent`.
+  - Configuração da infraestrutura via `RabbitMQConfig`.
+  - Implementação `RabbitMQEventPublisher`.
+  - Listeners para processamento em background (`ExpiracaoReservaListener` e `NotificacaoListener`).
+  - Testes unitários e de integração para mensageria (`RabbitMQEventPublisherTest`, `RabbitMQIntegrationTest`, etc).
 - Adição de exemplos de código para testes unitários, testes de controller (WebMvcTest) e de integração no `GEMINI.md`.
 - Sistema de Reserva de Ingressos com Redis:
   - Entidades de domínio: `Ingresso`, `Lote`, `Reserva` com enums `StatusIngresso` e `StatusReserva`.
