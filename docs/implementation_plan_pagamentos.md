@@ -491,7 +491,6 @@ Record: `pagamentoId`, `reservaId`, `valor`, `status`, `metodoPagamento`, `trans
 - Mock do `EventPublisher` e `LockManager` via `@MockitoBean`
 
 ### Comando para executar os testes
-
 ```bash
-JAVA_HOME=/caminho/para/jdk25 ./gradlew test
+./gradlew test
 ```

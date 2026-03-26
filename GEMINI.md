@@ -13,12 +13,22 @@
 
 *Requer JDK 25 instalado. O Gradle Wrapper (`./gradlew`) está incluído no projeto.*
 
-*Configure o `JAVA_HOME` no arquivo `gradle.properties` ou via variável de ambiente.*
+*Configure o `JAVA_HOME` no arquivo `gradle.properties` ou via variável de ambientes no arquivos .bashrc ou .zshrc (Linux/Mac) ou .bash_profile (Windows).*
+
+```bash
+# Linux/Mac $HOME/.bashrc ou $HOME/.zshrc
+export JAVA_HOME=/caminho/para/jdk25
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Windows .bash_profile
+export JAVA_HOME=C:\caminho\para\jdk25
+export PATH=$JAVA_HOME/bin:$PATH
+```
 
 - **Infraestrutura:** `docker compose up -d` (PostgreSQL, Redis, RabbitMQ)
-- **Build:** `JAVA_HOME=/caminho/para/jdk25 ./gradlew build`
-- **Run API:** `JAVA_HOME=/caminho/para/jdk25 ./gradlew bootRun`
-- **Tests:** `JAVA_HOME=/caminho/para/jdk25 ./gradlew test`
+- **Build:** `./gradlew build`
+- **Run API:** `./gradlew bootRun`
+- **Tests:** `./gradlew test`
 
 ## Development Conventions
 
@@ -95,7 +105,7 @@
 ## Fluxo de Trabalho e Git
 
 - **Workflow de Commit (Obrigatório):** Antes de realizar qualquer commit, você DEVE:
-    1. Validar as alterações rodando a suíte de testes: `JAVA_HOME=/caminho/para/jdk25 ./gradlew test`.
+    1. Validar as alterações rodando a suíte de testes: `./gradlew test`.
     2. Atualizar o arquivo `CHANGELOG.md` com as novas implementações ou correções.
     3. Revisar e atualizar o `README.md` caso novos módulos sejam concluídos ou o roadmap mude.
     4. Revisar e atualizar este arquivo (`GEMINI.md`) caso novas convenções ou tecnologias sejam adicionadas.
