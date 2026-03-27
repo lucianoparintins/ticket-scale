@@ -1,7 +1,7 @@
 package com.ticketscale.application.usecase;
 
 import com.ticketscale.application.port.out.*;
-import com.ticketscale.application.ports.LockManager;
+import com.ticketscale.application.port.out.LockManager;
 import com.ticketscale.domain.event.PagamentoConfirmadoEvent;
 import com.ticketscale.domain.pagamento.*;
 import com.ticketscale.domain.reserva.Ingresso;

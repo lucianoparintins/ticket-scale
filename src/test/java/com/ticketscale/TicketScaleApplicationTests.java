@@ -1,6 +1,6 @@
 package com.ticketscale;
 
-import com.ticketscale.application.ports.LockManager;
+import com.ticketscale.application.port.out.LockManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

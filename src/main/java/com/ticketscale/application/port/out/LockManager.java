@@ -1,4 +1,4 @@
-package com.ticketscale.application.ports;
+package com.ticketscale.application.port.out;
 
 public interface LockManager {
     

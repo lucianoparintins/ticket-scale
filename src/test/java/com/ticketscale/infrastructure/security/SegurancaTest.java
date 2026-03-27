@@ -1,5 +1,5 @@
 package com.ticketscale.infrastructure.security;
-import com.ticketscale.application.ports.LockManager;
+import com.ticketscale.application.port.out.LockManager;
 import com.ticketscale.domain.usuario.Papel;
 import com.ticketscale.domain.usuario.Usuario;
 import com.ticketscale.infrastructure.persistence.UsuarioJpaRepository;

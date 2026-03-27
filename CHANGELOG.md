@@ -29,7 +29,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Validações reforçadas nos builders das entidades.
   - Endpoints de actuator: `/actuator/health`, `/actuator/metrics`, `/actuator/prometheus`.
 - **Qualidade de Software e CI/CD:**
+  - Unificação dos pacotes de portas da aplicação: `application.ports` removido e `LockManager` movido para `application.port.out`.
   - Configuração do JaCoCo para relatórios de cobertura de testes (HTML/XML).
+
   - Integração do Checkstyle para padronização de código Java.
   - **PMD** para análise estática de bugs e más práticas.
   - **SonarQube Local** (via Docker) como alternativa ao SonarCloud.

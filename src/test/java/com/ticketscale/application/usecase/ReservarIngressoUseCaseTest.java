@@ -1,6 +1,6 @@
 package com.ticketscale.application.usecase;
 
-import com.ticketscale.application.ports.LockManager;
+import com.ticketscale.application.port.out.LockManager;
 import com.ticketscale.domain.evento.Evento;
 import com.ticketscale.domain.evento.PeriodoEvento;
 import com.ticketscale.domain.reserva.*;

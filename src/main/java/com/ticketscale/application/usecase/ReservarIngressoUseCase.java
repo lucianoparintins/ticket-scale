@@ -1,6 +1,6 @@
 package com.ticketscale.application.usecase;
 
-import com.ticketscale.application.ports.LockManager;
+import com.ticketscale.application.port.out.LockManager;
 import com.ticketscale.domain.reserva.*;
 import com.ticketscale.domain.usuario.Usuario;
 import com.ticketscale.domain.usuario.UsuarioRepository;

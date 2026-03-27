@@ -558,7 +558,7 @@ Record: `pagamentoId`, `reservaId`, `valor`, `status`, `metodoPagamento`, `trans
 
 | # | Débito | Impacto | Sugestão |
 |---|---|---|---|
-| 1 | **Pacotes `port/` vs `ports/`**: A camada `application` possui duas convenções — `application.port.out` (contém `EventPublisher`) e `application.ports` (contém `LockManager`). | Confusão para novos desenvolvedores; quebra de padronização | Unificar em `application.port.out` e mover `LockManager` no mesmo refactoring |
+| 1 | **Pacotes `port/` vs `ports/`**: A camada `application` possui duas convenções — `application.port.out` (contém `EventPublisher`) e `application.ports` (contém `LockManager`). | Confusão para novos desenvolvedores; quebra de padronização | [CONCLUÍDO] Unificado em `application.port.out` |
 | 2 | **`ReservaCriadaEvent` usa classe tradicional com `String`**: Enquanto Java 25 favorece records, e os IDs do domínio são `UUID` | Inconsistência de estilo e tipo | Migrar para record com `UUID` em refactoring transversal de eventos |
 | 3 | **Repositórios do domínio estendem `JpaRepository`**: `ReservaRepository`, `IngressoRepository`, `LoteRepository` acoplam domínio ao Spring Data | Viola DIP / Clean Architecture | Aplicar o padrão de interface pura (como `PagamentoRepository`) retroativamente |
 
