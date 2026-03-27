@@ -82,6 +82,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Workflow de commit obrigatório:
   - Exigência de atualização de `CHANGELOG.md`, `README.md` e `GEMINI.md` antes de cada commit.
 
+### Removed
+- OWASP Dependency Check do workflow de CI (`.github/workflows/ci.yml`) para reduzir o tempo de execução. O scan ainda está disponível para execução local via `./gradlew dependencyCheckAnalyze`.
+
 ### Changed
 - `application.yml` original: Decomposto nos perfis `dev` e `prod` para melhor gestão de ambientes.
 
