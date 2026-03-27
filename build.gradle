@@ -127,6 +127,10 @@ pmd {
 
 sonar {
 	properties {
+		// Configuração para SonarQube Local
+		// Inicie com: docker compose up -d sonarqube
+		// Acesse: http://localhost:9000 (admin/admin)
+		property 'sonar.host.url', 'http://localhost:9000'
 		property 'sonar.projectKey', 'ticketscale'
 		property 'sonar.projectName', 'TicketScale'
 		property 'sonar.sources', 'src/main/java'
