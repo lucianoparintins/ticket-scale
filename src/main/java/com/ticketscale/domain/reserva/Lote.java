@@ -6,6 +6,10 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Entidade de domínio que representa um Lote de ingressos.
+ * Utiliza builder pattern para criação de instâncias.
+ */
 @Entity(name = "Lote")
 @Table(name = "lotes")
 public class Lote {
@@ -27,26 +31,50 @@ public class Lote {
     @Column(nullable = false)
     private int capacidade;
 
-    public Lote() {}
-
-    public Lote(UUID id, Evento evento, String nome, BigDecimal preco, int capacidade) {
-        this.id = id;
-        this.evento = evento;
-        this.nome = nome;
-        this.preco = preco;
-        this.capacidade = capacidade;
+    /**
+     * Construtor privado para forçar uso do builder.
+     */
+    private Lote(Builder builder) {
+        this.id = builder.id;
+        this.evento = builder.evento;
+        this.nome = builder.nome;
+        this.preco = builder.preco;
+        this.capacidade = builder.capacidade;
     }
 
-    public UUID getId() { return id; }
-    public Evento getEvento() { return evento; }
-    public String getNome() { return nome; }
-    public BigDecimal getPreco() { return preco; }
-    public int getCapacidade() { return capacidade; }
+    /**
+     * Construtor padrão necessário para JPA.
+     */
+    public Lote() {}
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Evento getEvento() {
+        return evento;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public BigDecimal getPreco() {
+        return preco;
+    }
+
+    public int getCapacidade() {
+        return capacidade;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Lote lote = (Lote) o;
         return Objects.equals(id, lote.id);
     }
@@ -54,5 +82,69 @@ public class Lote {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    /**
+     * Builder para criação de instâncias de Lote.
+     * @return novo builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder class para Lote.
+     */
+    public static class Builder {
+        private UUID id;
+        private Evento evento;
+        private String nome;
+        private BigDecimal preco;
+        private int capacidade;
+
+        public Builder id(UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder evento(Evento evento) {
+            this.evento = evento;
+            return this;
+        }
+
+        public Builder nome(String nome) {
+            this.nome = nome;
+            return this;
+        }
+
+        public Builder preco(BigDecimal preco) {
+            this.preco = preco;
+            return this;
+        }
+
+        public Builder capacidade(int capacidade) {
+            this.capacidade = capacidade;
+            return this;
+        }
+
+        public Lote build() {
+            validar();
+            return new Lote(this);
+        }
+
+        private void validar() {
+            if (evento == null) {
+                throw new IllegalArgumentException("Evento é obrigatório.");
+            }
+            if (nome == null || nome.trim().isEmpty()) {
+                throw new IllegalArgumentException("Nome é obrigatório.");
+            }
+            if (preco == null || preco.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Preço deve ser maior ou igual a zero.");
+            }
+            if (capacidade <= 0) {
+                throw new IllegalArgumentException("Capacidade deve ser maior que zero.");
+            }
+        }
     }
 }

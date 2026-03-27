@@ -58,26 +58,33 @@ public class ReservarIngressoIntegrationTest {
     @BeforeEach
     void setUp() {
         if(reservaRepository == null) return;
-        
+
         reservaRepository.deleteAll();
         ingressoRepository.deleteAll();
         loteRepository.deleteAll();
 
         usuario = new Usuario(null, "int_user", "pass123", Papel.USUARIO);
-        
-        try {
-           usuario = usuarioRepository.salvar(usuario);
-        } catch(Exception e){}
+        usuario = usuarioRepository.salvar(usuario);
 
-        Evento evento = new Evento(null, "Evento Int", "Descricao", new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)));
-        try {
-           evento = eventoRepository.salvar(evento);
-        } catch(Exception e){}
-        
-        lote = new Lote(null, evento, "Lote Unico", BigDecimal.valueOf(50.0), 10);
+        Evento evento = Evento.builder()
+                .nome("Evento Int")
+                .descricao("Descricao")
+                .periodo(new PeriodoEvento(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)))
+                .build();
+        evento = eventoRepository.salvar(evento);
+
+        lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote Unico")
+                .preco(BigDecimal.valueOf(50.0))
+                .capacidade(10)
+                .build();
         lote = loteRepository.save(lote);
 
-        Ingresso ingresso = new Ingresso(null, lote, StatusIngresso.LIVRE);
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.LIVRE)
+                .build();
         ingresso = ingressoRepository.save(ingresso);
     }
 

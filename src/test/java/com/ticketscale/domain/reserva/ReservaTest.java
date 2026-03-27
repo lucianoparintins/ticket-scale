@@ -1,5 +1,7 @@
 package com.ticketscale.domain.reserva;
 
+import com.ticketscale.domain.evento.Evento;
+import com.ticketscale.domain.evento.PeriodoEvento;
 import com.ticketscale.domain.usuario.Usuario;
 import com.ticketscale.domain.usuario.Papel;
 import org.junit.jupiter.api.Test;
@@ -13,11 +15,23 @@ class ReservaTest {
     @Test
     void isExpirada_deveRetornarTrue_quandoExpirouEStatusPendente() throws Exception {
         Usuario usuario = new Usuario(UUID.randomUUID(), "john", "pass", Papel.USUARIO);
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote", BigDecimal.TEN, 10);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.LIVRE);
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote")
+                .preco(BigDecimal.TEN)
+                .capacidade(10)
+                .build();
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.LIVRE)
+                .build();
 
         Reserva reserva = new Reserva(usuario, ingresso);
-        
+
         // Simular a data de expiração no passado via reflection (já que não usamos Clock injetável)
         var campo = Reserva.class.getDeclaredField("dataExpiracao");
         campo.setAccessible(true);
@@ -29,11 +43,23 @@ class ReservaTest {
     @Test
     void confirmarPagamento_deveAlterarStatusETemQueVenderIngresso() {
         Usuario usuario = new Usuario(UUID.randomUUID(), "john", "pass", Papel.USUARIO);
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote", BigDecimal.TEN, 10);
-        
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote")
+                .preco(BigDecimal.TEN)
+                .capacidade(10)
+                .build();
+
         // Simulando fluxo real
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.LIVRE);
-        ingresso.reservar(); 
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.LIVRE)
+                .build();
+        ingresso.reservar();
 
         Reserva reserva = new Reserva(usuario, ingresso);
         reserva.confirmarPagamento();
@@ -45,8 +71,20 @@ class ReservaTest {
     @Test
     void cancelar_deveRestaurarIngressoLivreEAlterarReservaCancelada() {
         Usuario usuario = new Usuario(UUID.randomUUID(), "john", "pass", Papel.USUARIO);
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote", BigDecimal.TEN, 10);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.LIVRE);
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote")
+                .preco(BigDecimal.TEN)
+                .capacidade(10)
+                .build();
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.LIVRE)
+                .build();
         ingresso.reservar();
 
         Reserva reserva = new Reserva(usuario, ingresso);

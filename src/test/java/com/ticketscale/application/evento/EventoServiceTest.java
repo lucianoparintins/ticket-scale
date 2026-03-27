@@ -56,8 +56,13 @@ class EventoServiceTest {
     @DisplayName("Deve desativar um evento")
     void deveDesativarEvento() {
         var id = UUID.randomUUID();
-        var evento = new Evento(id, "Show", "Desc", new PeriodoEvento(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
-        
+        var evento = Evento.builder()
+                .id(id)
+                .nome("Show")
+                .descricao("Desc")
+                .periodo(new PeriodoEvento(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)))
+                .build();
+
         when(repository.buscarPorId(id)).thenReturn(Optional.of(evento));
 
         service.desativar(id);

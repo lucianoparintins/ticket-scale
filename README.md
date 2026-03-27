@@ -198,6 +198,69 @@ src/main/java/com/ticketscale
 ├── infrastructure
 ├── interfaces
 ```
+
+## 📊 Qualidade de Software
+
+O projeto possui um conjunto de ferramentas para garantir qualidade do código:
+
+| Ferramenta | Finalidade | Comando |
+|------------|------------|---------|
+| **JaCoCo** | Cobertura de testes | `./gradlew jacocoTestReport` |
+| **Checkstyle** | Padronização de código | `./gradlew checkstyleMain checkstyleTest` |
+| **PMD** | Detecção de bugs e más práticas | `./gradlew pmdMain pmdTest` |
+| **OWASP Dependency Check** | Segurança de dependências | `./gradlew dependencyCheckAnalyze` |
+| **SonarQube Local** | Análise contínua (self-hosted) | `./gradlew sonar` |
+| **GitHub Actions** | CI/CD automatizado | Executado em cada push/PR |
+| **Spring Actuator** | Health checks e métricas | `/actuator/health`, `/actuator/metrics` |
+| **Micrometer Prometheus** | Export de métricas | `/actuator/prometheus` |
+| **MDC Logging** | Logs estruturados com correlation ID | Automático em todas as requisições |
+
+### Métricas de Qualidade
+
+- **Cobertura mínima de testes:** 80% (camadas domain e application)
+- **Padrão de código:** Checkstyle configurado com regras essenciais
+- **CI/CD:** Pipeline automatizado com testes, cobertura e análise estática
+
+### Relatórios
+
+- **Cobertura de testes:** `build/reports/jacoco/test/html/index.html`
+- **Checkstyle:** `build/reports/checkstyle/main.html` e `build/reports/checkstyle/test.html`
+- **PMD:** `build/reports/pmd/main.html` e `build/reports/pmd/test.html`
+- **OWASP:** `build/reports/dependency-check-report.html`
+
+### Script de Automação
+
+Use o script para gerar relatórios facilmente:
+
+```bash
+# Gerar todos os relatórios
+./scripts/quality-reports.sh
+
+# Gerar apenas JaCoCo
+./scripts/quality-reports.sh jacoco
+
+# Abrir relatórios no browser
+./scripts/quality-reports.sh open
+```
+
+### SonarQube Local (Alternativa ao SonarCloud)
+
+Para uma análise mais detalhada, use o SonarQube local:
+
+```bash
+# 1. Iniciar SonarQube (requer Docker)
+docker compose up -d sonarqube
+
+# 2. Aguardar inicialização (~2 minutos)
+# Acesse: http://localhost:9000 (login: admin/admin)
+
+# 3. Gerar análise
+./gradlew sonar
+
+# 4. Parar SonarQube
+docker compose stop sonarqube
+```
+
 ---
 
 ## ⚙️ Configuração e Execução
@@ -229,13 +292,23 @@ src/main/java/com/ticketscale
 
 ## 🛠️ Roadmap (Próximos Passos)
 
+### Implementado
 - [x] Módulo de autenticação (JWT) e testes automatizados
 - [x] Hashing de senhas seguro com Argon2id
 - [x] CRUD de eventos (Admin e Cliente)
 - [x] Sistema de reserva com Redis
 - [x] Integração com RabbitMQ
 - [x] Worker de processamento
+- [x] **Qualidade de Software (JaCoCo, Checkstyle, CI/CD, SonarCloud)**
+- [x] **Logs estruturados com MDC e correlation ID**
+- [x] **Spring Actuator e Micrometer para métricas**
+- [x] **Refatoração para Builder Pattern nas entidades**
+
+### Pendente
 - [ ] Dashboard administrativo
+- [ ] Testes de performance (Gatling/JMeter)
+- [ ] Testes de contrato (Spring Cloud Contract)
+- [ ] Pagamentos online
 
 ---
 

@@ -29,6 +29,11 @@ export PATH=$JAVA_HOME/bin:$PATH
 - **Build:** `./gradlew build`
 - **Run API:** `./gradlew bootRun`
 - **Tests:** `./gradlew test`
+- **Cobertura de Testes:** `./gradlew jacocoTestReport` (relatório em `build/reports/jacoco/test/html/`)
+- **Checkstyle:** `./gradlew checkstyleMain checkstyleTest`
+- **PMD:** `./gradlew pmdMain pmdTest`
+- **Script de Qualidade:** `./scripts/quality-reports.sh`
+- **SonarQube Local:** `docker compose up -d sonarqube` e `./gradlew sonar`
 
 ## Development Conventions
 
@@ -119,10 +124,17 @@ export PATH=$JAVA_HOME/bin:$PATH
 - `GEMINI.md`: This file, providing context and instructions for AI-assisted development.
 - `CHANGELOG.md`: Registro de todas as alterações notáveis do projeto.
 - `build.gradle`: Configuração de dependências e plugins (Gradle).
-- `docker-compose.yml`: Infraestrutura local (PostgreSQL, Redis, RabbitMQ).
+- `docker-compose.yml`: Infraestrutura local (PostgreSQL, Redis, RabbitMQ, **SonarQube**).
+- `.github/workflows/ci.yml`: Pipeline de CI/CD com GitHub Actions.
+- `config/checkstyle/checkstyle.xml`: Regras de padronização de código.
+- `config/pmd/ruleset.xml`: Regras de análise PMD.
+- `docs/plano_melhoria_qualidade.md`: Plano detalhado de melhoria de qualidade.
+- `docs/quality-dashboard.md`: Dashboard de relatórios de qualidade.
+- `scripts/quality-reports.sh`: Script de automação de relatórios.
 - `src/main/java/com/ticketscale/`: Root package com as camadas:
     - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`), repositórios e `PasswordHasher`.
     - `application/`: Casos de uso e portas (`EventoService`, `AutenticacaoService`, `ReservarIngressoUseCase`, `LockManager`).
-    - `infrastructure/`: Implementações técnicas (JPA para `Usuario` e `Evento`, Redis (`RedisLockManager`), RabbitMQ, `Argon2PasswordHasher`).
+    - `infrastructure/`: Implementações técnicas (JPA para `Usuario` e `Evento`, Redis (`RedisLockManager`), RabbitMQ, `Argon2PasswordHasher`, **LoggingFilter**, **Health Indicators**).
     - `interfaces/`: Controllers REST (`AutenticacaoController`, `UsuarioController`, `EventoController`, `ReservaController`) e DTOs.
 - `src/main/resources/application.yml`: Configuração do Spring Boot.
+- `src/main/resources/logback-spring.xml`: Configuração de logs estruturados com MDC.

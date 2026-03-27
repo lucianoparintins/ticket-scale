@@ -2,6 +2,11 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
+	id 'checkstyle'
+	id 'pmd'
+	id 'org.owasp.dependencycheck' version '12.1.0'
+	id 'org.sonarqube' version '6.0.1.5171'
 }
 
 group = 'com.ticketscale'
@@ -11,6 +16,15 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(25)
 	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += [
+		'-Xlint:all',
+		'-Xlint:-processing',
+		'-parameters'
+	]
+	options.encoding = 'UTF-8'
 }
 
 repositories {
@@ -24,6 +38,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'de.mkammerer:argon2-jvm:2.11'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
@@ -46,4 +62,79 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+	toolVersion = "0.8.13"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
+	
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/config/**',
+				'**/dto/**',
+				'**/*Application.*',
+				'**/*DTO.*'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'CLASS'
+			includes = ['com.ticketscale.domain.**', 'com.ticketscale.application.**']
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.80
+			}
+		}
+	}
+}
+
+check.dependsOn checkstyleMain, checkstyleTest, pmdMain, pmdTest
+
+checkstyle {
+	toolVersion = '10.12.0'
+	configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+	ignoreFailures = true
+	showViolations = true
+}
+
+pmd {
+	toolVersion = '6.55.0'
+	ignoreFailures = true
+	consoleOutput = false
+	ruleSets = [
+		'category/java/bestpractices.xml',
+		'category/java/errorprone.xml',
+		'category/java/performance.xml',
+		'category/java/security.xml'
+	]
+	reportsDir = file("$buildDir/reports/pmd")
+}
+
+sonar {
+	properties {
+		property 'sonar.projectKey', 'ticketscale'
+		property 'sonar.projectName', 'TicketScale'
+		property 'sonar.sources', 'src/main/java'
+		property 'sonar.tests', 'src/test/java'
+		property 'sonar.java.binaries', 'build/classes/java/main'
+		property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
+		property 'sonar.sourceEncoding', 'UTF-8'
+		property 'sonar.exclusions', '**/config/**,**/dto/**,**/*Application.*,**/*DTO.*'
+		property 'sonar.coverage.exclusions', '**/config/**,**/dto/**,**/*DTO.*,**/*Test.java'
+	}
 }

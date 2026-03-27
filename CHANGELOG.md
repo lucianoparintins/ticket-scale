@@ -7,6 +7,24 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Fase 2 e 3 - Melhorias de Qualidade e Código:**
+  - Logs estruturados com MDC e correlation ID (`LoggingFilter`).
+  - Configuração do Logback com padrão estruturado (`logback-spring.xml`).
+  - Spring Boot Actuator para health checks e métricas.
+  - Micrometer com Prometheus para monitoramento.
+  - Refatoração das entidades para Builder Pattern (`Evento`, `Reserva`, `Ingresso`, `Lote`).
+  - Validações reforçadas nos builders das entidades.
+  - Endpoints de actuator: `/actuator/health`, `/actuator/metrics`, `/actuator/prometheus`.
+- **Qualidade de Software e CI/CD:**
+  - Configuração do JaCoCo para relatórios de cobertura de testes (HTML/XML).
+  - Integração do Checkstyle para padronização de código Java.
+  - **PMD** para análise estática de bugs e más práticas.
+  - **SonarQube Local** (via Docker) como alternativa ao SonarCloud.
+  - Pipeline de CI/CD com GitHub Actions (`.github/workflows/ci.yml`).
+  - OWASP Dependency Check para segurança de dependências.
+  - Script de automação de relatórios (`scripts/quality-reports.sh`).
+  - Documentação do plano de melhoria de qualidade em `docs/plano_melhoria_qualidade.md`.
+  - Dashboard de qualidade em `docs/quality-dashboard.md`.
 - Plano de implementação da tecnologia de Pagamentos (`docs/implementation_plan_pagamentos.md`) revisado e adequado aos princípios de Clean Architecture, DDD, SOLID e concorrência (lock distribuído).
 - Habilitação de Virtual Threads do Java 25 no Spring Boot (`spring.threads.virtual.enabled: true`).
 - Integração com RabbitMQ (Fase 5):

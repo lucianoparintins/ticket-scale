@@ -1,6 +1,8 @@
 package com.ticketscale.interfaces.rest;
 
 import com.ticketscale.application.usecase.ReservarIngressoUseCase;
+import com.ticketscale.domain.evento.Evento;
+import com.ticketscale.domain.evento.PeriodoEvento;
 import com.ticketscale.domain.reserva.*;
 import com.ticketscale.domain.usuario.Papel;
 import com.ticketscale.domain.usuario.Usuario;
@@ -17,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -47,12 +50,31 @@ class ReservaControllerTest {
     void setUp() {
         loteId = UUID.randomUUID();
         usuarioId = UUID.randomUUID();
-        
-        var lote = new Lote(loteId, null, "Lote Teste", BigDecimal.TEN, 50);
-        var ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.RESERVADO);
+
+        Evento evento = Evento.builder()
+                .id(UUID.randomUUID())
+                .nome("Evento Teste")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+
+        var lote = Lote.builder()
+                .id(loteId)
+                .evento(evento)
+                .nome("Lote Teste")
+                .preco(BigDecimal.TEN)
+                .capacidade(50)
+                .build();
+        var ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.RESERVADO)
+                .build();
         var usuario = new Usuario(usuarioId, "tester", "pass", Papel.USUARIO);
-        
-        reservaMock = new Reserva(UUID.randomUUID(), usuario, ingresso);
+
+        reservaMock = Reserva.builder()
+                .id(UUID.randomUUID())
+                .usuario(usuario)
+                .ingresso(ingresso)
+                .build();
     }
 
     @Test

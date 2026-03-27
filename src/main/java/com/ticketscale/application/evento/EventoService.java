@@ -22,7 +22,11 @@ public class EventoService {
     @Transactional
     public Evento criar(String nome, String descricao, LocalDateTime dataInicio, LocalDateTime dataFim) {
         var periodo = new PeriodoEvento(dataInicio, dataFim);
-        var evento = new Evento(null, nome, descricao, periodo);
+        var evento = Evento.builder()
+                .nome(nome)
+                .descricao(descricao)
+                .periodo(periodo)
+                .build();
         return repository.salvar(evento);
     }
 

@@ -45,8 +45,13 @@ class EventoControllerTest {
         var id = UUID.randomUUID();
         var dataInicio = LocalDateTime.now().plusDays(1);
         var dataFim = LocalDateTime.now().plusDays(2);
-        var evento = new Evento(id, "Evento Teste", "Descricao Teste", new PeriodoEvento(dataInicio, dataFim));
-        
+        var evento = Evento.builder()
+                .id(id)
+                .nome("Evento Teste")
+                .descricao("Descricao Teste")
+                .periodo(new PeriodoEvento(dataInicio, dataFim))
+                .build();
+
         when(service.criar(any(), any(), any(), any())).thenReturn(evento);
 
         var json = """

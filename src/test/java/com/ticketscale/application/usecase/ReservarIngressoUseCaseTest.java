@@ -1,6 +1,8 @@
 package com.ticketscale.application.usecase;
 
 import com.ticketscale.application.ports.LockManager;
+import com.ticketscale.domain.evento.Evento;
+import com.ticketscale.domain.evento.PeriodoEvento;
 import com.ticketscale.domain.reserva.*;
 import com.ticketscale.domain.usuario.Usuario;
 import com.ticketscale.domain.usuario.UsuarioRepository;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,9 +54,27 @@ class ReservarIngressoUseCaseTest {
     void setUp() {
         loteId = UUID.randomUUID();
         usuarioId = UUID.randomUUID();
-        lote = new Lote(loteId, null, "Lote 1", BigDecimal.TEN, 100);
+        
+        Evento evento = Evento.builder()
+                .id(UUID.randomUUID())
+                .nome("Evento Teste")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        
+        lote = Lote.builder()
+                .id(loteId)
+                .evento(evento)
+                .nome("Lote 1")
+                .preco(BigDecimal.TEN)
+                .capacidade(100)
+                .build();
+        
         usuario = new Usuario(usuarioId, "john", "pass", Papel.USUARIO);
-        ingressoLivre = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.LIVRE);
+        
+        ingressoLivre = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.LIVRE)
+                .build();
     }
 
     @Test

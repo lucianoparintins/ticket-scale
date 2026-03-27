@@ -1,7 +1,10 @@
 package com.ticketscale.domain.reserva;
 
+import com.ticketscale.domain.evento.Evento;
+import com.ticketscale.domain.evento.PeriodoEvento;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,8 +12,20 @@ class IngressoTest {
 
     @Test
     void reservar_deveAlterarStatusParaReservado_quandoIngressoLivre() {
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote 1", BigDecimal.TEN, 100);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.LIVRE);
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote 1")
+                .preco(BigDecimal.TEN)
+                .capacidade(100)
+                .build();
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.LIVRE)
+                .build();
 
         ingresso.reservar();
 
@@ -19,8 +34,20 @@ class IngressoTest {
 
     @Test
     void reservar_deveLancarExcecao_quandoIngressoNaoLivre() {
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote 1", BigDecimal.TEN, 100);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.RESERVADO);
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote 1")
+                .preco(BigDecimal.TEN)
+                .capacidade(100)
+                .build();
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.RESERVADO)
+                .build();
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, ingresso::reservar);
         assertEquals("Ingresso não está livre para reserva.", exception.getMessage());
@@ -28,8 +55,20 @@ class IngressoTest {
 
     @Test
     void vender_deveAlterarStatusParaVendido_quandoIngressoReservado() {
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote 1", BigDecimal.TEN, 100);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.RESERVADO);
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote 1")
+                .preco(BigDecimal.TEN)
+                .capacidade(100)
+                .build();
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.RESERVADO)
+                .build();
 
         ingresso.vender();
 
@@ -38,8 +77,20 @@ class IngressoTest {
 
     @Test
     void liberar_deveRestaurarStatusParaLivre() {
-        Lote lote = new Lote(UUID.randomUUID(), null, "Lote 1", BigDecimal.TEN, 100);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), lote, StatusIngresso.RESERVADO);
+        Evento evento = Evento.builder()
+                .nome("Evento")
+                .periodo(new PeriodoEvento(LocalDateTime.now(), LocalDateTime.now().plusDays(1)))
+                .build();
+        Lote lote = Lote.builder()
+                .evento(evento)
+                .nome("Lote 1")
+                .preco(BigDecimal.TEN)
+                .capacidade(100)
+                .build();
+        Ingresso ingresso = Ingresso.builder()
+                .lote(lote)
+                .status(StatusIngresso.RESERVADO)
+                .build();
 
         ingresso.liberar();
 
