@@ -299,16 +299,16 @@ docker compose stop sonarqube
 - [x] Sistema de reserva com Redis
 - [x] Integração com RabbitMQ
 - [x] Worker de processamento
-- [x] **Qualidade de Software (JaCoCo, Checkstyle, CI/CD, SonarCloud)**
-- [x] **Logs estruturados com MDC e correlation ID**
-- [x] **Spring Actuator e Micrometer para métricas**
-- [x] **Refatoração para Builder Pattern nas entidades**
+- [x] Qualidade de Software (JaCoCo, Checkstyle, CI/CD, SonarCloud)
+- [x] Logs estruturados com MDC e correlation ID
+- [x] Spring Actuator e Micrometer para métricas
+- [x] Refatoração para Builder Pattern nas entidades
+- [x] Módulo de pagamentos online (Pix, Débito e Crédito)
 
 ### Pendente
 - [ ] Dashboard administrativo
 - [ ] Testes de performance (Gatling/JMeter)
 - [ ] Testes de contrato (Spring Cloud Contract)
-- [ ] Pagamentos online
 
 ---
 

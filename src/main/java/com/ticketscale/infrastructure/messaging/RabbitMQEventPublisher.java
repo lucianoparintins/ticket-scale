@@ -1,6 +1,7 @@
 package com.ticketscale.infrastructure.messaging;
 
 import com.ticketscale.application.port.out.EventPublisher;
+import com.ticketscale.domain.event.PagamentoConfirmadoEvent;
 import com.ticketscale.domain.event.ReservaCriadaEvent;
 import com.ticketscale.infrastructure.config.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,6 +30,15 @@ public class RabbitMQEventPublisher implements EventPublisher {
         rabbitTemplate.convertAndSend(
             RabbitMQConfig.EXCHANGE_TICKETSCALE_EVENTS,
             RabbitMQConfig.ROUTING_KEY_RESERVA_EXPIRACAO,
+            evento
+        );
+    }
+
+    @Override
+    public void publicarPagamentoConfirmado(PagamentoConfirmadoEvent evento) {
+        rabbitTemplate.convertAndSend(
+            RabbitMQConfig.EXCHANGE_TICKETSCALE_EVENTS,
+            RabbitMQConfig.ROUTING_KEY_PAGAMENTO_CONFIRMADO,
             evento
         );
     }

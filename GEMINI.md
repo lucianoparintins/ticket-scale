@@ -97,6 +97,12 @@ export PATH=$JAVA_HOME/bin:$PATH
       }
       ```
     - **Injeção de Mocks:** Utilize `@MockitoBean` em vez de `@MockBean` para compatibilidade com as versões mais recentes do Spring Boot.
+- **Módulo de Pagamento:**
+    - Utilize o **Strategy Pattern** via `GatewayPagamentoResolver` para gerenciar diferentes métodos de pagamento.
+    - Utilize **Sealed Interfaces** (`DadosMetodoPagamento`) para garantir tipagem segura e sem nulos nos dados de pagamento.
+    - **DIP (Dependency Inversion Principle):** Repositórios do domínio de pagamento devem ser interfaces puras, com implementações JPA localizadas na camada de infraestrutura.
+    - **Concorrência:** Sempre adquira um lock distribuído (Redis) via `LockManager` antes de processar um pagamento para garantir idempotência.
+    - **Exceções:** Crie exceções de domínio específicas herdando de `PagamentoException` e mapeie-as para status HTTP adequados no `PagamentoExceptionHandler`.
 - **Idioma do Código:** Todo o código (nomes de variáveis, classes, métodos, etc.) deve ser escrito em **Português (pt-br)**, visando clareza e padronização dentro do contexto do projeto.
 - **Architectural Layers:** The project follows Clean Architecture with a clear separation of concerns:
     - `domain`: Core business logic and rules (inclui `PasswordHasher`).

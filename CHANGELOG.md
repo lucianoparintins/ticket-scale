@@ -7,6 +7,19 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Módulo de Pagamento de Ingressos (Fase 4):**
+  - Implementação do fluxo de pagamento seguindo Clean Architecture, SOLID e DDD.
+  - Suporte a 3 métodos de pagamento: **Pix**, **Cartão de Débito** e **Cartão de Crédito**.
+  - Design baseado em **Strategy pattern** com `GatewayPagamentoResolver` para seleção de gateways.
+  - **Inversão de Dependência (DIP)**: `PagamentoRepository` como interface pura no domínio, com implementação JPA na infraestrutura.
+  - Caso de uso `ProcessarPagamentoUseCase` com **lock distribuído (Redis)** para garantir idempotência e evitar race conditions.
+  - Sealed interface `DadosMetodoPagamento` (Java 25) para eliminação de campos nulos e validação por tipo (pattern matching).
+  - Entidade de domínio `Pagamento` com ciclo de vida (`PENDENTE`, `APROVADO`, `RECUSADO`).
+  - Evento de domínio `PagamentoConfirmadoEvent` integrado ao RabbitMQ via `EventPublisher`.
+  - Mocks de gateways (`MockGatewayPix`, `MockGatewayCartaoDebito`, `MockGatewayCartaoCredito`) para desenvolvimento e testes.
+  - Tratamento de exceções centralizado com `PagamentoExceptionHandler` mapeando erros de domínio para códigos HTTP.
+  - Testes unitários abrangentes para domínio, aplicação e infraestrutura.
+  - Teste de controller com `@WebMvcTest` para validação de payload e respostas REST.
 - **Fase 2 e 3 - Melhorias de Qualidade e Código:**
   - Logs estruturados com MDC e correlation ID (`LoggingFilter`).
   - Configuração do Logback com padrão estruturado (`logback-spring.xml`).

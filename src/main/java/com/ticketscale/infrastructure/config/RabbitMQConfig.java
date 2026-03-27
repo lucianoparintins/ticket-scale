@@ -16,9 +16,11 @@ public class RabbitMQConfig {
     
     public static final String QUEUE_NOTIFICATIONS = "ticketscale.notifications";
     public static final String QUEUE_RESERVATIONS_EXPIRATION = "ticketscale.reservations.expiration";
+    public static final String QUEUE_PAYMENTS_CONFIRMED = "ticketscale.payments.confirmed";
     
     public static final String ROUTING_KEY_RESERVA_CRIADA = "reserva.criada";
     public static final String ROUTING_KEY_RESERVA_EXPIRACAO = "reserva.expiracao";
+    public static final String ROUTING_KEY_PAGAMENTO_CONFIRMADO = "pagamento.confirmado";
 
     @Bean
     public TopicExchange eventsExchange() {
@@ -36,6 +38,11 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue paymentsConfirmedQueue() {
+        return new Queue(QUEUE_PAYMENTS_CONFIRMED, true);
+    }
+
+    @Bean
     public Binding notificationsBinding(Queue notificationsQueue, TopicExchange eventsExchange) {
         return BindingBuilder.bind(notificationsQueue).to(eventsExchange).with(ROUTING_KEY_RESERVA_CRIADA);
     }
@@ -43,6 +50,11 @@ public class RabbitMQConfig {
     @Bean
     public Binding reservationsExpirationBinding(Queue reservationsExpirationQueue, TopicExchange eventsExchange) {
         return BindingBuilder.bind(reservationsExpirationQueue).to(eventsExchange).with(ROUTING_KEY_RESERVA_EXPIRACAO);
+    }
+
+    @Bean
+    public Binding paymentsConfirmedBinding(Queue paymentsConfirmedQueue, TopicExchange eventsExchange) {
+        return BindingBuilder.bind(paymentsConfirmedQueue).to(eventsExchange).with(ROUTING_KEY_PAGAMENTO_CONFIRMADO);
     }
 
     @Bean
