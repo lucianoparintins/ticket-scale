@@ -7,6 +7,19 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Dashboard Administrativo (Fase 6):**
+  - Implementação de endpoints para relatórios e métricas de vendas (exclusivo para `ADMIN`).
+  - Camada de domínio: Records `MetricaVendas`, `RelatorioReceita`, `FiltroDashboard` e `MetricasDashboard`.
+  - Interface `DashboardRepository` no domínio para desacoplamento.
+  - Implementação `DashboardRepositoryImpl` na infraestrutura usando **JPQL dinâmico** com `EntityManager` para consultas complexas e agregações (`SUM`, `COUNT`, `GROUP BY`).
+  - Casos de uso: `GerarRelatorioVendasPorEvento`, `CalcularReceitaTotal` e `ObterMetricasDashboard`.
+  - Endpoints REST em `DashboardController`:
+    - `GET /dashboard/vendas-por-evento`: Vendas agrupadas por evento com filtros de data.
+    - `GET /dashboard/receita-total`: Cálculo de receita no período selecionado.
+    - `GET /dashboard/metricas`: Visão consolidada com receita, ingressos vendidos e **taxa de conversão**.
+  - Configuração de segurança no `SecurityConfigurations` para restringir acesso ao dashboard apenas para perfis administrativos.
+  - Testes unitários para todos os novos casos de uso com Mockito.
+  - Teste de controller com `WebMvcTest` validando JSON de resposta e mapeamento de parâmetros.
 - **Módulo de Pagamento de Ingressos (Fase 4):**
   - Implementação do fluxo de pagamento seguindo Clean Architecture, SOLID e DDD.
   - Suporte a 3 métodos de pagamento: **Pix**, **Cartão de Débito** e **Cartão de Crédito**.

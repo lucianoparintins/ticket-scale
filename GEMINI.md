@@ -138,9 +138,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 - `docs/quality-dashboard.md`: Dashboard de relatórios de qualidade.
 - `scripts/quality-reports.sh`: Script de automação de relatórios.
 - `src/main/java/com/ticketscale/`: Root package com as camadas:
-    - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`), repositórios e `PasswordHasher`.
-    - `application/`: Casos de uso e portas (`EventoService`, `AutenticacaoService`, `ReservarIngressoUseCase`, `LockManager`).
-    - `infrastructure/`: Implementações técnicas (JPA para `Usuario` e `Evento`, Redis (`RedisLockManager`), RabbitMQ, `Argon2PasswordHasher`, **LoggingFilter**, **Health Indicators**).
-    - `interfaces/`: Controllers REST (`AutenticacaoController`, `UsuarioController`, `EventoController`, `ReservaController`) e DTOs.
+    - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`), **dashboard** (`MetricaVendas`, `RelatorioReceita`, `MetricasDashboard`), repositórios e `PasswordHasher`.
+    - `application/`: Casos de uso e portas (`EventoService`, `AutenticacaoService`, `ReservarIngressoUseCase`, **GerarRelatorioVendasPorEvento**, **CalcularReceitaTotal**, **ObterMetricasDashboard**, `LockManager`).
+    - `infrastructure/`: Implementações técnicas (JPA para `Usuario` e `Evento`, Redis (`RedisLockManager`), RabbitMQ, **Persistence/Dashboard** (`DashboardRepositoryImpl`), `Argon2PasswordHasher`, **LoggingFilter**, **Health Indicators**).
+    - `interfaces/`: Controllers REST (`AutenticacaoController`, `UsuarioController`, `EventoController`, `ReservaController`, **DashboardController**) e DTOs.
 - `src/main/resources/application.yml`: Configuração do Spring Boot.
 - `src/main/resources/logback-spring.xml`: Configuração de logs estruturados com MDC.
