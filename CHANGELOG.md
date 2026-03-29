@@ -7,6 +7,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Documentação de Planejamento:**
+  - Criação do `docs/plano_implementacao_pendencias.md` com plano detalhado para implementação das pendências do projeto.
+  - Documento inclui 7 pendências identificadas na análise do README.md.
+  - Definição de 8 decisões arquiteturais validadas (Nginx + Docker Swarm, Cache-aside, SPA Embutida, Gatling, Contratos Mínimos, Apenas Retry, Alertas por E-mail).
+  - Estimativa de carga horária total: ~100-128 horas distribuídas em 4 fases.
+  - Matriz de riscos e definição de pronto (DoD) para cada item.
+- **Convenções de Desenvolvimento:**
+  - Adição de diretriz no `GEMINI.md` para uso de **ripgrep (`rg`)** ao invés de `grep` para buscas no código-fonte.
+  - Ripgrep é mais rápido e respeita automaticamente arquivos `.gitignore`.
+  - Exemplos de uso adicionados: busca por classe, padrão regex, filtro por tipo, glob pattern e contexto.
 - **Dashboard Administrativo (Fase 6):**
   - Implementação de endpoints para relatórios e métricas de vendas (exclusivo para `ADMIN`).
   - Camada de domínio: Records `MetricaVendas`, `RelatorioReceita`, `FiltroDashboard` e `MetricasDashboard`.
