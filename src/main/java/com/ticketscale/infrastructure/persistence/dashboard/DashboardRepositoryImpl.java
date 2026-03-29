@@ -2,7 +2,6 @@ package com.ticketscale.infrastructure.persistence.dashboard;
 
 import com.ticketscale.domain.dashboard.*;
 import com.ticketscale.domain.pagamento.StatusPagamento;
-import com.ticketscale.domain.reserva.StatusReserva;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;

@@ -109,6 +109,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - OWASP Dependency Check do workflow de CI (`.github/workflows/ci.yml`) para reduzir o tempo de execução. O scan ainda está disponível para execução local via `./gradlew dependencyCheckAnalyze`.
 
 ### Changed
+- Refatoração de código para remoção de imports não utilizados em diversas classes de infraestrutura (`DashboardRepositoryImpl`, `SecurityConfigurations`, `TokenService`) e suítes de testes.
+- Ajuste na configuração do RabbitMQ (`RabbitMQConfig`) para utilizar `JacksonJsonMessageConverter` em conformidade com as dependências do projeto.
 - `application.yml` original: Decomposto nos perfis `dev` e `prod` para melhor gestão de ambientes.
 
 ## [0.0.1] - 2026-03-24
