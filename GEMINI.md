@@ -37,6 +37,15 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 ## Development Conventions
 
+- **Ferramentas de Busca:** Utilize **ripgrep (`rg`)** ao invés de `grep` para buscas no código-fonte. O ripgrep é mais rápido e respeita automaticamente arquivos `.gitignore`.
+  ```bash
+  # Exemplos de uso
+  rg "ReservarIngressoUseCase"                    # Buscar por classe
+  rg "public.*List<.*>.*eventos"                  # Buscar padrão regex
+  rg --type java "CacheManager"                   # Buscar apenas em Java
+  rg --glob "*.yml" "rabbitmq"                    # Buscar em YAML
+  rg -A 3 -B 3 "LockManager"                      # Buscar com contexto
+  ```
 - **Java 25:** Utilize as novidades e recursos mais recentes do Java 25 (e.g., Virtual Threads, Pattern Matching aprimorado, Scoped Values, Structured Concurrency, etc.) sempre que possível para garantir um código moderno e eficiente.
 - **Segurança e Hashing:**
     - O hashing de senhas deve SEMPRE utilizar o `Argon2id`.
