@@ -7,6 +7,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Configuração de Testes:**
+  - Adição da anotação `@ActiveProfiles("test")` nas classes `TicketScaleApplicationTests` e `SegurancaTest` para garantir o uso das configurações de teste.
+  - Atualização do `src/test/resources/application.yml` com configurações locais (localhost) para Redis e RabbitMQ e desabilitação do auto-startup do listener RabbitMQ durante os testes.
 - **Documentação de Planejamento:**
   - Criação do `docs/plano_implementacao_pendencias.md` com plano detalhado para implementação das pendências do projeto.
   - Documento inclui 7 pendências identificadas na análise do README.md.

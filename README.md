@@ -304,9 +304,9 @@ docker compose stop sonarqube
 - [x] Spring Actuator e Micrometer para métricas
 - [x] Refatoração para Builder Pattern nas entidades
 - [x] Módulo de pagamentos online (Pix, Débito e Crédito)
+- [x] Dashboard administrativo
 
 ### Pendente
-- [ ] Dashboard administrativo
 - [ ] Testes de performance (Gatling/JMeter)
 - [ ] Testes de contrato (Spring Cloud Contract)
 
