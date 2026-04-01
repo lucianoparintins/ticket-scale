@@ -147,8 +147,8 @@ O lock distribuído está implementado, mas o cache de leitura para consultas fr
 
 #### 2.4 Invalidação
 - [x] Invalidar cache de eventos ao criar/editar/desativar
-- [ ] Invalidar cache de lotes ao alterar quantidade/preço (ainda sem service de alteração)
-- [ ] Publicar evento de invalidação via RabbitMQ (Redis garante consistência entre instâncias)
+- [x] Invalidar cache de lotes ao alterar quantidade/preço (LoteService implementado)
+- [x] Publicar evento de invalidação via RabbitMQ (CacheInvalidadoEvent implementado)
 
 ### Arquivos a Criar/Modificar
 
