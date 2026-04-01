@@ -1,3 +1,5 @@
+package com.ticketscale.infrastructure.messaging;
+
 import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.domain.event.CacheInvalidadoEvent;
 import com.ticketscale.domain.event.PagamentoConfirmadoEvent;

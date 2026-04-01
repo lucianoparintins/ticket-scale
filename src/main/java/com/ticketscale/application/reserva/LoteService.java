@@ -1,3 +1,5 @@
+package com.ticketscale.application.reserva;
+
 import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.domain.event.CacheInvalidadoEvent;
 import com.ticketscale.domain.reserva.Lote;

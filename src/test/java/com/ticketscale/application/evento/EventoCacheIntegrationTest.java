@@ -1,10 +1,11 @@
 package com.ticketscale.application.evento;
 
+import com.ticketscale.application.port.out.EventPublisher;
+import com.ticketscale.config.TestConfig;
 import com.ticketscale.domain.evento.Evento;
 import com.ticketscale.domain.evento.EventoRepository;
 import com.ticketscale.domain.evento.PeriodoEvento;
 import com.ticketscale.infrastructure.config.CacheConfig;
-import com.ticketscale.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ class EventoCacheIntegrationTest {
 
     @MockitoBean
     private EventoRepository eventoRepository;
+
+    @MockitoBean
+    private EventPublisher eventPublisher;
 
     @Autowired
     private CacheManager cacheManager;

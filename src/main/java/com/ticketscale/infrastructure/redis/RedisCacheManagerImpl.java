@@ -3,7 +3,6 @@ package com.ticketscale.infrastructure.redis;
 import com.ticketscale.application.port.out.CacheManager;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 @Component

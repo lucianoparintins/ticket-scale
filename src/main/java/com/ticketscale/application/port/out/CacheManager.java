@@ -1,6 +1,5 @@
 package com.ticketscale.application.port.out;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**

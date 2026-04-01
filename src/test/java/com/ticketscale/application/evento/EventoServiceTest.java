@@ -1,5 +1,6 @@
 package com.ticketscale.application.evento;
 
+import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.domain.evento.Evento;
 import com.ticketscale.domain.evento.EventoRepository;
 import com.ticketscale.domain.evento.PeriodoEvento;
@@ -23,6 +24,9 @@ class EventoServiceTest {
 
     @Mock
     private EventoRepository repository;
+
+    @Mock
+    private EventPublisher eventPublisher;
 
     @InjectMocks
     private EventoService service;

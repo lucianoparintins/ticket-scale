@@ -1,3 +1,5 @@
+package com.ticketscale.application.evento;
+
 import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.domain.event.CacheInvalidadoEvent;
 import com.ticketscale.domain.evento.Evento;
