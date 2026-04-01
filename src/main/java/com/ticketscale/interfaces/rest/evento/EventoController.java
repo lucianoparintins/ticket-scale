@@ -39,7 +39,7 @@ public class EventoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity desativar(@PathVariable UUID id) {
+    public ResponseEntity<Void> desativar(@PathVariable UUID id) {
         service.desativar(id);
         return ResponseEntity.noContent().build();
     }

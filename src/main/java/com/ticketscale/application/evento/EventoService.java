@@ -3,6 +3,10 @@ package com.ticketscale.application.evento;
 import com.ticketscale.domain.evento.Evento;
 import com.ticketscale.domain.evento.EventoRepository;
 import com.ticketscale.domain.evento.PeriodoEvento;
+import com.ticketscale.infrastructure.config.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@org.springframework.cache.annotation.CacheConfig(cacheNames = CacheConfig.CACHE_EVENTOS)
 public class EventoService {
 
     private final EventoRepository repository;
@@ -20,6 +25,7 @@ public class EventoService {
     }
 
     @Transactional
+    @CacheEvict(allEntries = true)
     public Evento criar(String nome, String descricao, LocalDateTime dataInicio, LocalDateTime dataFim) {
         var periodo = new PeriodoEvento(dataInicio, dataFim);
         var evento = Evento.builder()
@@ -31,6 +37,10 @@ public class EventoService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(key = "#id"),
+        @CacheEvict(allEntries = true)
+    })
     public Evento atualizar(UUID id, String nome, String descricao, LocalDateTime dataInicio, LocalDateTime dataFim) {
         var evento = repository.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento não encontrado."));
@@ -46,16 +56,22 @@ public class EventoService {
         return repository.salvar(evento);
     }
 
+    @Cacheable(key = "'ativos'")
     public List<Evento> listarAtivos() {
         return repository.listarAtivos();
     }
 
+    @Cacheable(key = "#id")
     public Evento buscarPorId(UUID id) {
         return repository.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Evento não encontrado."));
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(key = "#id"),
+        @CacheEvict(allEntries = true)
+    })
     public void desativar(UUID id) {
         var evento = buscarPorId(id);
         evento.desativar();

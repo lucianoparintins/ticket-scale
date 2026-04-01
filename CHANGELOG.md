@@ -7,6 +7,20 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Cache de Leitura com Redis (Política Cache-aside):**
+  - Implementação de cache distribuído para reduzir latência e carga no banco de dados.
+  - Interface `CacheManager` na camada de aplicação para desacoplamento.
+  - Implementação `RedisCacheManagerImpl` na infraestrutura usando Spring Cache.
+  - Configuração de TTLs customizados por entidade:
+    - Eventos: 5 minutos.
+    - Lotes: 2 minutos.
+    - Dashboard: 10 minutos.
+  - Prefixação de chaves com `ticketscale:` para organização no Redis.
+  - Serialização JSON (Jackson) para compatibilidade e legibilidade.
+  - Cache aplicado em:
+    - `EventoService`: Listagem de ativos e busca por ID.
+    - Dashboard: Métricas consolidadas, receita total e vendas por evento.
+  - Estratégia de invalidação (`@CacheEvict`) ao criar, atualizar ou desativar eventos.
 - **Nginx Load Balancer com Auto-scaling (Fase 1 - Fundação):**
   - Configuração completa do Nginx como load balancer e reverse proxy.
   - Load balancing com algoritmo `least_conn` para distribuição inteligente de requisições.
