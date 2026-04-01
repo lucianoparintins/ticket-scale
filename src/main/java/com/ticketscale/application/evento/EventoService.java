@@ -1,5 +1,5 @@
-package com.ticketscale.application.evento;
-
+import com.ticketscale.application.port.out.EventPublisher;
+import com.ticketscale.domain.event.CacheInvalidadoEvent;
 import com.ticketscale.domain.evento.Evento;
 import com.ticketscale.domain.evento.EventoRepository;
 import com.ticketscale.domain.evento.PeriodoEvento;
@@ -19,9 +19,11 @@ import java.util.UUID;
 public class EventoService {
 
     private final EventoRepository repository;
+    private final EventPublisher eventPublisher;
 
-    public EventoService(EventoRepository repository) {
+    public EventoService(EventoRepository repository, EventPublisher eventPublisher) {
         this.repository = repository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -33,7 +35,13 @@ public class EventoService {
                 .descricao(descricao)
                 .periodo(periodo)
                 .build();
-        return repository.salvar(evento);
+        
+        Evento salvo = repository.salvar(evento);
+        
+        // Notifica outras instâncias sobre a invalidação geral da lista
+        eventPublisher.publicarInvalidacaoCache(new CacheInvalidadoEvent(CacheConfig.CACHE_EVENTOS, null));
+        
+        return salvo;
     }
 
     @Transactional
@@ -53,7 +61,13 @@ public class EventoService {
         }
         
         evento.atualizar(nome, descricao, novoPeriodo);
-        return repository.salvar(evento);
+        Evento salvo = repository.salvar(evento);
+
+        // Notifica outras instâncias
+        eventPublisher.publicarInvalidacaoCache(new CacheInvalidadoEvent(CacheConfig.CACHE_EVENTOS, id.toString()));
+        eventPublisher.publicarInvalidacaoCache(new CacheInvalidadoEvent(CacheConfig.CACHE_EVENTOS, "ativos"));
+
+        return salvo;
     }
 
     @Cacheable(key = "'ativos'")
@@ -76,5 +90,9 @@ public class EventoService {
         var evento = buscarPorId(id);
         evento.desativar();
         repository.salvar(evento);
+
+        // Notifica outras instâncias
+        eventPublisher.publicarInvalidacaoCache(new CacheInvalidadoEvent(CacheConfig.CACHE_EVENTOS, id.toString()));
+        eventPublisher.publicarInvalidacaoCache(new CacheInvalidadoEvent(CacheConfig.CACHE_EVENTOS, "ativos"));
     }
 }

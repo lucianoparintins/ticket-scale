@@ -1,6 +1,5 @@
-package com.ticketscale.infrastructure.messaging;
-
 import com.ticketscale.application.port.out.EventPublisher;
+import com.ticketscale.domain.event.CacheInvalidadoEvent;
 import com.ticketscale.domain.event.PagamentoConfirmadoEvent;
 import com.ticketscale.domain.event.ReservaCriadaEvent;
 import com.ticketscale.infrastructure.config.RabbitMQConfig;
@@ -39,6 +38,15 @@ public class RabbitMQEventPublisher implements EventPublisher {
         rabbitTemplate.convertAndSend(
             RabbitMQConfig.EXCHANGE_TICKETSCALE_EVENTS,
             RabbitMQConfig.ROUTING_KEY_PAGAMENTO_CONFIRMADO,
+            evento
+        );
+    }
+
+    @Override
+    public void publicarInvalidacaoCache(CacheInvalidadoEvent evento) {
+        rabbitTemplate.convertAndSend(
+            RabbitMQConfig.EXCHANGE_TICKETSCALE_EVENTS,
+            RabbitMQConfig.ROUTING_KEY_CACHE_INVALIDADO,
             evento
         );
     }

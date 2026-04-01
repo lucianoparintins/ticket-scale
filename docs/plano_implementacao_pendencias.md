@@ -173,8 +173,8 @@ src/main/java/com/ticketscale/
 - [x] Consultas de eventos retornam do cache (segunda chamada)
 - [x] Cache é invalidado após criação/edição de evento
 - [x] TTL configurado funciona corretamente
-- [ ] Testes validam comportamento do cache
-- [ ] Métricas de hit/miss rate disponíveis
+- [x] Testes validam comportamento do cache (EventoCacheIntegrationTest)
+- [x] Métricas de hit/miss rate disponíveis via Actuator
 
 ### Estimativa
 - **Tempo:** 8-12 horas
