@@ -38,3 +38,12 @@ out/
 
 # Gradle
 gradle.properties
+
+# Environment variables
+.env
+
+# Nginx logs
+nginx/logs/
+
+# Docker Swarm
+.docker/

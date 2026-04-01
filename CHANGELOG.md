@@ -7,6 +7,32 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- **Nginx Load Balancer com Auto-scaling (Fase 1 - Fundação):**
+  - Configuração completa do Nginx como load balancer e reverse proxy.
+  - Load balancing com algoritmo `least_conn` para distribuição inteligente de requisições.
+  - Rate limiting configurado: 100 req/s (geral) e 10 req/s (autenticação).
+  - Health checks para API e Nginx.
+  - Suporte a arquivos estáticos para dashboard administrativo.
+  - Configurações separadas para desenvolvimento e produção.
+  - **Docker Swarm:**
+    - `docker-compose.prod.yml` com configuração para Swarm mode.
+    - DNS round-robin para descoberta automática de instâncias da API.
+    - Auto-scaling manual e automático (2-10 réplicas).
+    - Script `auto-scale.sh` para scaling baseado em CPU/Memory.
+    - Recursos limitados por container (CPU, memória).
+  - **Dockerfile:**
+    - Build em multi-stage para imagem otimizada.
+    - Usuário não-root para segurança.
+    - Health checks integrados.
+    - Otimizações JVM para containers.
+  - **Documentação:**
+    - README detalhado no diretório `nginx/`.
+    - `.env.example` com variáveis de ambiente para produção.
+    - Atualização do README principal com instruções de deploy.
+  - **Segurança:**
+    - Headers de segurança (X-Frame-Options, X-Content-Type-Options, etc.).
+    - Rate limiting para proteção contra DDoS básico.
+  - Arquivos criados: `nginx/nginx.conf`, `nginx/upstream.conf`, `nginx/conf.d/default.conf`, `nginx/nginx.prod.conf`, `docker-compose.prod.yml`, `Dockerfile`, `scripts/auto-scale.sh`.
 - **Configuração de Testes:**
   - Adição da anotação `@ActiveProfiles("test")` nas classes `TicketScaleApplicationTests` e `SegurancaTest` para garantir o uso das configurações de teste.
   - Atualização do `src/test/resources/application.yml` com configurações locais (localhost) para Redis e RabbitMQ e desabilitação do auto-startup do listener RabbitMQ durante os testes.

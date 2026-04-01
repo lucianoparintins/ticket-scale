@@ -69,7 +69,9 @@ Workers (processamento assíncrono)
 - RabbitMQ
 
 ### Infraestrutura
-- Nginx (load balancer)
+- Nginx (load balancer + reverse proxy)
+- Docker Swarm (orquestração e auto-scaling)
+- Prometheus + Grafana (métricas e monitoramento)
 
 ---
 
@@ -268,25 +270,85 @@ docker compose stop sonarqube
 ### Pré-requisitos
 - JDK 25 instalado.
 - Docker e Docker Compose instalados.
+- Docker Swarm (para produção).
 
 ### Passos para rodar em Desenvolvimento
-1.  **Infraestrutura:** Suba o banco, cache e mensageria:
+
+1. **Infraestrutura:** Suba o banco, cache, mensageria e nginx:
     ```bash
     docker compose up -d
     ```
-2.  **Variáveis de Ambiente:** Defina o pepper (opcional no dev, obrigatório no prod):
+
+2. **Variáveis de Ambiente:** Defina o pepper (opcional no dev):
     ```bash
     export PASSWORD_PEPPER=meu_pepper_secreto
     ```
-3.  **Aplicação:** Inicie a API (perfil `dev` ativo por padrão):
+
+3. **Acessar API:** A API está disponível através do Nginx:
     ```bash
-    ./gradlew bootRun
+    # Health check
+    curl http://localhost/health
+    
+    # API endpoint
+    curl http://localhost/api/eventos
+    
+    # Actuator
+    curl http://localhost/actuator/health
+    ```
+
+4. **Logs:**
+    ```bash
+    # Nginx
+    docker logs -f ticketscale-nginx
+    
+    # API
+    docker logs -f ticketscale-api
+    ```
+
+### Produção (Docker Swarm)
+
+1. **Configurar variáveis de ambiente:**
+    ```bash
+    cp .env.example .env
+    # Edite .env com valores seguros
+    ```
+
+2. **Inicializar Docker Swarm (se necessário):**
+    ```bash
+    docker swarm init
+    ```
+
+3. **Deploy do stack:**
+    ```bash
+    docker stack deploy -c docker-compose.prod.yml ticketscale
+    ```
+
+4. **Verificar serviços:**
+    ```bash
+    docker service ls
+    docker service logs -f ticketscale_nginx
+    ```
+
+5. **Auto-scaling:**
+    ```bash
+    # Automático (script)
+    ./scripts/auto-scale.sh 2 10 70
+    
+    # Manual
+    docker service scale ticketscale_api=5
+    ```
+
+6. **Remover stack:**
+    ```bash
+    docker stack rm ticketscale
     ```
 
 ### Perfis de Ambiente
-- **dev (padrão):** Configurado para uso local com containers Docker.
-- **prod:** Requer variáveis de ambiente (`DB_URL`, `REDIS_HOST`, `PASSWORD_PEPPER`, etc.).
-- **test:** Usado automaticamente durante a execução de `./gradlew test` (usa banco H2 em memória).
+
+| Perfil | Descrição | Nginx | Réplicas API |
+|--------|-----------|-------|--------------|
+| `dev` (padrão) | Local com Docker Compose | ✅ 1 instância | 1 |
+| `prod` | Produção com Docker Swarm | ✅ 2 instâncias | 2-10 (auto-scaling) |
 
 ---
 
@@ -305,10 +367,15 @@ docker compose stop sonarqube
 - [x] Refatoração para Builder Pattern nas entidades
 - [x] Módulo de pagamentos online (Pix, Débito e Crédito)
 - [x] Dashboard administrativo
+- [x] Nginx Load Balancer com auto-scaling (Docker Swarm)
 
 ### Pendente
-- [ ] Testes de performance (Gatling/JMeter)
+- [ ] Cache de leitura com Redis (Cache-aside)
+- [ ] Dashboard Administrativo (UI - React)
+- [ ] Testes de performance (Gatling)
 - [ ] Testes de contrato (Spring Cloud Contract)
+- [ ] Retry automático para falhas transitórias
+- [ ] Métricas e alertas (Grafana + E-mail)
 
 ---
 
