@@ -366,12 +366,11 @@ docker compose stop sonarqube
 - [x] Spring Actuator e Micrometer para métricas
 - [x] Refatoração para Builder Pattern nas entidades
 - [x] Módulo de pagamentos online (Pix, Débito e Crédito)
-- [x] Dashboard administrativo
+- [x] Dashboard administrativo (APIs e UI React)
 - [x] Nginx Load Balancer com auto-scaling (Docker Swarm)
 
 ### Pendente
 - [ ] Cache de leitura com Redis (Cache-aside)
-- [ ] Dashboard Administrativo (UI - React)
 - [ ] Testes de performance (Gatling)
 - [ ] Testes de contrato (Spring Cloud Contract)
 - [ ] Retry automático para falhas transitórias

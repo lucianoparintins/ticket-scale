@@ -198,12 +198,12 @@ As APIs do dashboard estão implementadas (`DashboardController`, casos de uso),
 
 **Opção Selecionada: C - SPA Estática Embutida**
 
-- [ ] Build de React + TypeScript no `src/main/resources/static/admin`
-- [ ] Spring Boot serve arquivos estáticos
-- [ ] Vite como build tool
-- [ ] Bootstrap + Material Design para UI
-- [ ] Deploy único junto com a API
-- [ ] API de autenticação separada (`/api/**`)
+- [x] Build de React + TypeScript no `src/main/resources/static/admin`
+- [x] Spring Boot serve arquivos estáticos
+- [x] Vite como build tool
+- [x] Vanilla CSS para UI (conforme GEMINI.md)
+- [x] Deploy único junto com a API
+- [x] API de autenticação separada (`/api/**`)
 
 **Vantagens desta abordagem:**
 - Deploy simplificado (apenas um artifact)
@@ -213,52 +213,37 @@ As APIs do dashboard estão implementadas (`DashboardController`, casos de uso),
 
 #### 3.2 Páginas a Implementar
 
-| Página | Funcionalidades | Prioridade |
+| Página | Funcionalidades | Status |
 |--------|----------------|------------|
-| Login | Autenticação JWT | Alta |
-| Dashboard | Visão geral com cards de métricas | Alta |
-| Eventos | Listar, criar, editar, desativar | Alta |
-| Vendas | Gráfico de vendas por período | Média |
-| Ingressos | Gestão de lotes e preços | Média |
+| Login | Autenticação JWT | **Concluído** |
+| Dashboard | Visão geral com cards de métricas | **Concluído** |
+| Eventos | Listar, criar, editar, desativar | **Concluído** |
+| Vendas | Tabela de vendas por evento | **Concluído** |
+| Ingressos | Gestão de lotes e preços | Pendente |
 | Relatórios | Exportar dados (CSV/PDF) | Baixa |
 
 #### 3.3 Componentes Visuais
-- [ ] Cards de métricas (receita, vendas, conversão)
-- [ ] Tabela de eventos com paginação
-- [ ] Formulário de cadastro de eventos
-- [ ] Gráficos (Chart.js ou Recharts)
-- [ ] Toasts para notificações
+- [x] Cards de métricas (receita, vendas, conversão)
+- [x] Tabela de eventos com paginação
+- [x] Formulário de cadastro de eventos
+- [x] Ícones informativos (Lucide)
+- [x] Feedback visual de ações (Alerts/Confirm)
 
-### Arquivos a Criar
+### Arquivos Criados
 
 ```
-src/main/resources/static/admin/
-├── index.html
-├── vite.config.ts
-├── package.json
-├── src/
-│   ├── main.tsx
-│   ├── App.tsx
-│   ├── components/
-│   │   ├── Dashboard/
-│   │   ├── Eventos/
-│   │   ├── Vendas/
-│   │   └── common/
-│   ├── services/
-│   │   └── api.ts
-│   ├── hooks/
-│   └── styles/
-└── public/
-    └── manifest.json
+frontend/                  (código fonte)
+src/main/resources/static/admin/ (build final)
+src/main/java/com/ticketscale/interfaces/rest/FrontendForwardController.java (roteamento SPA)
 ```
 
 ### Critérios de Aceite
 
-- [ ] Autenticação JWT integrada
-- [ ] Dashboard exibe métricas em tempo real
-- [ ] CRUD de eventos funcional via UI
-- [ ] Layout responsivo (mobile-friendly)
-- [ ] Tratamento de erros e loading states
+- [x] Autenticação JWT integrada
+- [x] Dashboard exibe métricas em tempo real
+- [x] CRUD de eventos funcional via UI
+- [x] Layout responsivo (mobile-friendly)
+- [x] Tratamento de erros e loading states
 
 ### Estimativa
 - **Tempo:** 40-60 horas
@@ -625,3 +610,4 @@ Para dúvidas sobre este plano, consulte a documentação do projeto ou abra uma
 |------|--------|-------|-----------|
 | 29/03/2026 | 1.0 | Equipe | Criação inicial do plano |
 | 29/03/2026 | 1.1 | Equipe | Atualização com decisões arquiteturais validadas: <br>• Nginx com Docker Swarm auto-scaling <br>• Cache-aside policy <br>• SPA React embutida <br>• Gatling para performance <br>• Contratos mínimos <br>• Apenas Retry (sem circuit breaker) <br>• Alertas por e-mail |
+dadas: <br>• Nginx com Docker Swarm auto-scaling <br>• Cache-aside policy <br>• SPA React embutida <br>• Gatling para performance <br>• Contratos mínimos <br>• Apenas Retry (sem circuit breaker) <br>• Alertas por e-mail |
