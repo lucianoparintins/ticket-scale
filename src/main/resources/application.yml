@@ -18,7 +18,8 @@ spring:
 api:
   security:
     token:
-      secret: ${JWT_SECRET:12345678}
+      # Precisa ter pelo menos 32 bytes (256 bits) para HS256+.
+      secret: ${JWT_SECRET:dev-jwt-secret-please-change-32bytes}
 
 server:
   port: ${PORT:8080}

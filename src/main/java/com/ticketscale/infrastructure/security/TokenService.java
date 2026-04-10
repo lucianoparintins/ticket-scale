@@ -21,13 +21,12 @@ public class TokenService {
 
     public String gerarToken(Usuario usuario) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(segredo.getBytes(StandardCharsets.UTF_8));
             return Jwts.builder()
                     .issuer("ticket-scale-api")
                     .subject(usuario.getLogin())
                     .claim("id", usuario.getId().toString())
                     .expiration(dataExpiracao())
-                    .signWith(key)
+                    .signWith(secretKey())
                     .compact();
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar token jwt", e);
@@ -36,9 +35,8 @@ public class TokenService {
 
     public String validarToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(segredo.getBytes(StandardCharsets.UTF_8));
             Claims claims = Jwts.parser()
-                    .verifyWith(key)
+                    .verifyWith(secretKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -46,6 +44,23 @@ public class TokenService {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    private SecretKey secretKey() {
+        if (segredo == null || segredo.isBlank()) {
+            throw new IllegalStateException("JWT secret nao configurado. Defina JWT_SECRET (minimo 32 bytes).");
+        }
+
+        byte[] keyBytes = segredo.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException(
+                    "JWT_SECRET muito curto (" + (keyBytes.length * 8) + " bits). " +
+                            "Use no minimo 256 bits (32 bytes) para HS256+. " +
+                            "Ex: JWT_SECRET='uma-chave-com-32-bytes-ou-mais...'"
+            );
+        }
+
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private Date dataExpiracao() {
