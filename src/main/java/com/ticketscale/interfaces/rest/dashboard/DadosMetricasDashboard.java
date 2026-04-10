@@ -8,14 +8,24 @@ public record DadosMetricasDashboard(
     BigDecimal receitaTotal,
     long ingressosVendidos,
     List<DadosMetricaVendas> vendasPorEvento,
-    double taxaConversao
+    double taxaConversao,
+    // Compat: campos usados pelo bundle antigo do admin (/admin) ainda em resources/static.
+    long totalVendas,
+    long totalReservas,
+    double ticketMedio
 ) {
     public DadosMetricasDashboard(MetricasDashboard metricas) {
+        BigDecimal receita = metricas.receitaTotal() != null ? metricas.receitaTotal() : BigDecimal.ZERO;
+        long vendas = metricas.ingressosVendidos();
+        double ticketMedio = vendas > 0 ? receita.doubleValue() / vendas : 0.0;
         this(
-            metricas.receitaTotal(),
+            receita,
             metricas.ingressosVendidos(),
             metricas.vendasPorEvento().stream().map(DadosMetricaVendas::new).toList(),
-            metricas.taxaConversao()
+            metricas.taxaConversao(),
+            vendas,
+            0L,
+            ticketMedio
         );
     }
 }

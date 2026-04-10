@@ -8,9 +8,22 @@ public record DadosMetricaVendas(
     UUID eventoId,
     String eventoNome,
     long ingressosVendidos,
-    BigDecimal receitaTotal
+    BigDecimal receitaTotal,
+    // Compat: campos usados pelo bundle antigo do admin (/admin) ainda em resources/static.
+    String nomeEvento,
+    long quantidadeVendida,
+    BigDecimal valorTotal
 ) {
     public DadosMetricaVendas(MetricaVendas metrica) {
-        this(metrica.eventoId(), metrica.eventoNome(), metrica.ingressosVendidos(), metrica.receitaTotal());
+        BigDecimal receita = metrica.receitaTotal() != null ? metrica.receitaTotal() : BigDecimal.ZERO;
+        this(
+                metrica.eventoId(),
+                metrica.eventoNome(),
+                metrica.ingressosVendidos(),
+                receita,
+                metrica.eventoNome(),
+                metrica.ingressosVendidos(),
+                receita
+        );
     }
 }

@@ -58,7 +58,11 @@ class DashboardControllerTest {
         mockMvc.perform(get("/api/dashboard/vendas-por-evento"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].eventoNome").value("Evento Teste"))
-                .andExpect(jsonPath("$[0].ingressosVendidos").value(10));
+                .andExpect(jsonPath("$[0].ingressosVendidos").value(10))
+                // Compat: campos do bundle antigo do admin (/admin)
+                .andExpect(jsonPath("$[0].nomeEvento").value("Evento Teste"))
+                .andExpect(jsonPath("$[0].quantidadeVendida").value(10))
+                .andExpect(jsonPath("$[0].valorTotal").value(100));
     }
 
     @Test
@@ -70,7 +74,9 @@ class DashboardControllerTest {
         mockMvc.perform(get("/api/dashboard/receita-total"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(1000))
-                .andExpect(jsonPath("$.quantidadeVendas").value(50));
+                .andExpect(jsonPath("$.quantidadeVendas").value(50))
+                // Compat: campo do bundle antigo do admin (/admin)
+                .andExpect(jsonPath("$.valorTotal").value(1000));
     }
 
     @Test
@@ -82,6 +88,9 @@ class DashboardControllerTest {
         mockMvc.perform(get("/api/dashboard/metricas"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.receitaTotal").value(1000))
-                .andExpect(jsonPath("$.taxaConversao").value(0.8));
+                .andExpect(jsonPath("$.taxaConversao").value(0.8))
+                // Compat: campos do bundle antigo do admin (/admin)
+                .andExpect(jsonPath("$.totalVendas").value(10))
+                .andExpect(jsonPath("$.totalReservas").value(0));
     }
 }
