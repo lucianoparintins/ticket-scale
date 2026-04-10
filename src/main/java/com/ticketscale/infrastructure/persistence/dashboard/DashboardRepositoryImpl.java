@@ -18,7 +18,7 @@ public class DashboardRepositoryImpl implements DashboardRepository {
 
     @Override
     public List<MetricaVendas> buscarVendasPorEvento(FiltroDashboard filtro) {
-        String jpql = """
+        StringBuilder jpql = new StringBuilder("""
             SELECT new com.ticketscale.domain.dashboard.MetricaVendas(
                 e.id, e.nome, COUNT(p.id), SUM(p.valor)
             )
@@ -28,36 +28,63 @@ public class DashboardRepositoryImpl implements DashboardRepository {
             JOIN i.lote l
             JOIN l.evento e
             WHERE p.status = :statusPagamento
-              AND (:dataInicio IS NULL OR p.dataCriacao >= :dataInicio)
-              AND (:dataFim IS NULL OR p.dataCriacao <= :dataFim)
-              AND (:eventoId IS NULL OR e.id = :eventoId)
-            GROUP BY e.id, e.nome
-        """;
+        """);
 
-        TypedQuery<MetricaVendas> query = entityManager.createQuery(jpql, MetricaVendas.class);
+        // Evita ":param IS NULL OR ..." pois o PostgreSQL pode nao inferir o tipo quando o valor e null.
+        if (filtro.dataInicio() != null) {
+            jpql.append(" AND p.dataCriacao >= :dataInicio");
+        }
+        if (filtro.dataFim() != null) {
+            jpql.append(" AND p.dataCriacao <= :dataFim");
+        }
+        if (filtro.eventoId() != null) {
+            jpql.append(" AND e.id = :eventoId");
+        }
+
+        jpql.append(" GROUP BY e.id, e.nome");
+
+        TypedQuery<MetricaVendas> query = entityManager.createQuery(jpql.toString(), MetricaVendas.class);
         query.setParameter("statusPagamento", StatusPagamento.APROVADO);
-        query.setParameter("dataInicio", filtro.dataInicio());
-        query.setParameter("dataFim", filtro.dataFim());
-        query.setParameter("eventoId", filtro.eventoId());
+        if (filtro.dataInicio() != null) {
+            query.setParameter("dataInicio", filtro.dataInicio());
+        }
+        if (filtro.dataFim() != null) {
+            query.setParameter("dataFim", filtro.dataFim());
+        }
+        if (filtro.eventoId() != null) {
+            query.setParameter("eventoId", filtro.eventoId());
+        }
 
         return query.getResultList();
     }
 
     @Override
     public RelatorioReceita calcularReceitaTotal(FiltroDashboard filtro) {
-        String jpql = """
+        StringBuilder jpql = new StringBuilder("""
             SELECT SUM(p.valor), COUNT(p.id)
             FROM Pagamento p
             WHERE p.status = :statusPagamento
-              AND (:dataInicio IS NULL OR p.dataCriacao >= :dataInicio)
-              AND (:dataFim IS NULL OR p.dataCriacao <= :dataFim)
-        """;
+        """);
 
-        Object[] result = (Object[]) entityManager.createQuery(jpql)
-                .setParameter("statusPagamento", StatusPagamento.APROVADO)
-                .setParameter("dataInicio", filtro.dataInicio())
-                .setParameter("dataFim", filtro.dataFim())
-                .getSingleResult();
+        // Evita ":param IS NULL OR ..." pois o PostgreSQL pode nao inferir o tipo quando o valor e null.
+        if (filtro.dataInicio() != null) {
+            jpql.append(" AND p.dataCriacao >= :dataInicio");
+        }
+        if (filtro.dataFim() != null) {
+            jpql.append(" AND p.dataCriacao <= :dataFim");
+        }
+
+        var query = entityManager.createQuery(jpql.toString())
+                .setParameter("statusPagamento", StatusPagamento.APROVADO);
+
+        if (filtro.dataInicio() != null) {
+            query.setParameter("dataInicio", filtro.dataInicio());
+        }
+        if (filtro.dataFim() != null) {
+            query.setParameter("dataFim", filtro.dataFim());
+        }
+
+        Object[] result = (Object[]) query.getSingleResult();
 
         BigDecimal total = result[0] != null ? (BigDecimal) result[0] : BigDecimal.ZERO;
         long quantidade = result[1] != null ? (long) result[1] : 0L;
@@ -74,16 +101,27 @@ public class DashboardRepositoryImpl implements DashboardRepository {
         // Na verdade, no TicketScale, uma Reserva CONFIRMADA é aquela que teve o pagamento aprovado.
         // Talvez a taxa de conversão seja Pagamentos APROVADOS / Total de Reservas Criadas.
         
-        String jpqlReservas = """
+        StringBuilder jpqlReservas = new StringBuilder("""
             SELECT COUNT(r.id) FROM Reserva r
-            WHERE (:dataInicio IS NULL OR r.dataCriacao >= :dataInicio)
-              AND (:dataFim IS NULL OR r.dataCriacao <= :dataFim)
-        """;
+            WHERE 1 = 1
+        """);
+
+        if (filtro.dataInicio() != null) {
+            jpqlReservas.append(" AND r.dataCriacao >= :dataInicio");
+        }
+        if (filtro.dataFim() != null) {
+            jpqlReservas.append(" AND r.dataCriacao <= :dataFim");
+        }
         
-        long totalReservas = (long) entityManager.createQuery(jpqlReservas)
-                .setParameter("dataInicio", filtro.dataInicio())
-                .setParameter("dataFim", filtro.dataFim())
-                .getSingleResult();
+        var queryReservas = entityManager.createQuery(jpqlReservas.toString());
+        if (filtro.dataInicio() != null) {
+            queryReservas.setParameter("dataInicio", filtro.dataInicio());
+        }
+        if (filtro.dataFim() != null) {
+            queryReservas.setParameter("dataFim", filtro.dataFim());
+        }
+
+        long totalReservas = (long) queryReservas.getSingleResult();
         
         double taxaConversao = totalReservas > 0 ? (double) receita.quantidadeVendas() / totalReservas : 0.0;
 
