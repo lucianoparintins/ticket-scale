@@ -20,7 +20,11 @@ public class GerarRelatorioVendasPorEvento {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = CacheConfig.CACHE_DASHBOARD, key = "'vendas_evento:' + #filtro")
+    @Cacheable(
+            value = CacheConfig.CACHE_DASHBOARD,
+            key = "'vendas_evento:' + #filtro",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public List<MetricaVendas> executar(FiltroDashboard filtro) {
         return dashboardRepository.buscarVendasPorEvento(filtro);
     }

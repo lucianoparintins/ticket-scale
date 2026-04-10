@@ -74,7 +74,13 @@ class EventoCacheIntegrationTest {
     @Test
     @DisplayName("Deve invalidar cache de lista após criar novo evento")
     void deveInvalidarCacheAosCriar() {
-        when(eventoRepository.listarAtivos()).thenReturn(List.of());
+        Evento evento = Evento.builder()
+                .id(UUID.randomUUID())
+                .nome("Evento Ativo")
+                .periodo(new PeriodoEvento(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)))
+                .build();
+
+        when(eventoRepository.listarAtivos()).thenReturn(List.of(evento));
 
         // Popula cache de lista
         eventoService.listarAtivos();

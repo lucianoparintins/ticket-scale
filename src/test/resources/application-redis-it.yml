@@ -1,0 +1,14 @@
+spring:
+  autoconfigure:
+    # Habilita Redis para este profile (no application.yml de teste ele e excluido).
+    exclude:
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+  sql:
+    init:
+      mode: never

@@ -72,7 +72,8 @@ public class EventoService {
         return salvo;
     }
 
-    @Cacheable(key = "'ativos'")
+    // Evita cachear lista vazia para nao persistir "[]" no Redis e reduzir risco de incompatibilidade de serializer.
+    @Cacheable(key = "'ativos'", unless = "#result == null || #result.isEmpty()")
     public List<Evento> listarAtivos() {
         return repository.listarAtivos();
     }
