@@ -6,6 +6,18 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
+### Adicionado
+- **Dashboard Administrativo (UI):**
+  - SPA React embutida com Vite e TypeScript no root `/frontend`.
+  - Build automatizado para `src/main/resources/static/admin`.
+  - Interface de Login com autenticação JWT integrada.
+  - Visão geral com métricas de vendas, receita e conversão.
+  - Gestão de Eventos (Listagem, Criação e Desativação).
+  - Relatório detalhado de Vendas por Evento.
+  - Configuração de roteamento SPA no Spring Boot via `FrontendForwardController`.
+  - Atualização das configurações de segurança para permitir acesso aos recursos estáticos do admin.
+  - Estilização com Vanilla CSS seguindo as diretrizes do `GEMINI.md`.
+
 ### Added
 - **Cache de Leitura com Redis (Política Cache-aside):**
   - Implementação de cache distribuído para reduzir latência e carga no banco de dados.

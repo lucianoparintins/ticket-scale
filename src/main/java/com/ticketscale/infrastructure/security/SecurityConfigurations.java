@@ -29,6 +29,7 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/login").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
+                    req.requestMatchers("/admin/**", "/static/**", "/index.html").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/eventos").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/eventos/**").hasRole("ADMIN");
                     req.requestMatchers("/dashboard/**").hasRole("ADMIN");
