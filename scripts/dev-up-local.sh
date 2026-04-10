@@ -18,9 +18,10 @@ KEEP_INFRA=0
 usage() {
   cat <<'EOF'
 Uso:
-  scripts/dev-up-local.sh            # sobe postgres/redis/rabbit e roda ./gradlew bootRun
+  scripts/dev-up-local.sh            # sobe infra e roda API (bootRun) + frontend (npm run dev)
   scripts/dev-up-local.sh --keep     # nao derruba a infra ao sair
   scripts/dev-up-local.sh --down     # derruba a infra e sai
+  scripts/dev-up-local.sh --no-frontend  # nao inicia o frontend (somente API)
 EOF
 }
 
@@ -39,9 +40,26 @@ if [[ "${1:-}" == "--down" ]]; then
   exit 0
 fi
 
+NO_FRONTEND=0
+if [[ "${1:-}" == "--no-frontend" ]]; then
+  NO_FRONTEND=1
+  shift
+fi
+
 command -v docker >/dev/null 2>&1 || die "docker nao encontrado no PATH"
 
 cleanup() {
+  if [[ -n "${FRONTEND_PID:-}" ]] && kill -0 "${FRONTEND_PID}" >/dev/null 2>&1; then
+    log "Encerrando frontend (pid ${FRONTEND_PID})..."
+    kill "${FRONTEND_PID}" >/dev/null 2>&1 || true
+    wait "${FRONTEND_PID}" >/dev/null 2>&1 || true
+  fi
+  if [[ -n "${API_PID:-}" ]] && kill -0 "${API_PID}" >/dev/null 2>&1; then
+    log "Encerrando API (pid ${API_PID})..."
+    kill "${API_PID}" >/dev/null 2>&1 || true
+    wait "${API_PID}" >/dev/null 2>&1 || true
+  fi
+
   if [[ "${KEEP_INFRA}" -eq 1 ]]; then
     log "Mantendo infra ativa (--keep)."
     return 0
@@ -82,5 +100,23 @@ wait_for "RabbitMQ" "docker exec ticketscale-rabbitmq rabbitmq-diagnostics -q pi
 export PASSWORD_PEPPER="${PASSWORD_PEPPER:-default_pepper}"
 
 log "Iniciando API via Gradle..."
-cd "${ROOT_DIR}"
-exec ./gradlew bootRun
+(cd "${ROOT_DIR}" && ./gradlew bootRun) &
+API_PID=$!
+
+if [[ "${NO_FRONTEND}" -eq 1 ]]; then
+  log "Frontend desabilitado (--no-frontend)."
+  wait "${API_PID}"
+  exit $?
+fi
+
+command -v npm >/dev/null 2>&1 || die "npm nao encontrado no PATH"
+
+log "Iniciando frontend (npm run dev)..."
+(cd "${ROOT_DIR}/frontend" && npm run dev) &
+FRONTEND_PID=$!
+
+log "API PID: ${API_PID} | Frontend PID: ${FRONTEND_PID}"
+log "Acesse: http://localhost:5173/admin/login"
+
+# Encerra tudo se qualquer processo terminar.
+wait -n "${API_PID}" "${FRONTEND_PID}"
