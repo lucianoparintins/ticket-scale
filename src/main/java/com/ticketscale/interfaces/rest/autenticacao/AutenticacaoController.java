@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/api/login")
 public class AutenticacaoController {
 
     private final AuthenticationManager manager;
@@ -25,11 +25,21 @@ public class AutenticacaoController {
 
     @PostMapping
     public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
-        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
-        var authentication = manager.authenticate(authenticationToken);
+        try {
+            var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
+            var authentication = manager.authenticate(authenticationToken);
 
-        var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
+            var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
 
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            org.slf4j.LoggerFactory.getLogger(AutenticacaoController.class).error("Erro de autenticação para login {}: {}", dados.login(), e.getMessage());
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body(new ErroAutenticacaoDTO(e.getMessage()));
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(AutenticacaoController.class).error("Erro inesperado no login", e);
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
+
+record ErroAutenticacaoDTO(String mensagem) {}

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     private final UsuarioJpaRepository repository;
@@ -30,7 +30,7 @@ public class UsuarioController {
         var usuario = new Usuario(null, dados.login(), passwordEncoder.encode(dados.senha()), dados.papel());
         repository.save(usuario);
 
-        var uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
+        var uri = uriBuilder.path("/api/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
 
         return ResponseEntity.created(uri).body(new DadosDetalhamentoUsuario(usuario));
     }

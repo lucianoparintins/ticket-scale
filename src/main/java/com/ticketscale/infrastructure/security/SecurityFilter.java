@@ -26,14 +26,21 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String tokenJWT = recuperarToken(request);
-        if (tokenJWT != null) {
-            String login = tokenService.validarToken(tokenJWT);
-            if (!login.isEmpty()) {
-                UserDetails usuario = repository.findByLogin(login);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            String tokenJWT = recuperarToken(request);
+            if (tokenJWT != null) {
+                String login = tokenService.validarToken(tokenJWT);
+                if (login != null && !login.isEmpty()) {
+                    var usuario = repository.findByLogin(login);
+                    if (usuario != null) {
+                        var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
+        } catch (Exception e) {
+            // Log the error but continue the filter chain
+            org.slf4j.LoggerFactory.getLogger(SecurityFilter.class).error("Erro no SecurityFilter", e);
         }
         filterChain.doFilter(request, response);
     }

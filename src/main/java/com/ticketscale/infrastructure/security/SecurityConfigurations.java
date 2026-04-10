@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,28 +23,25 @@ public class SecurityConfigurations {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(csrf -> csrf.disable())
+        return http
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
-                    req.requestMatchers(HttpMethod.POST, "/login").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
-                    req.requestMatchers("/admin/**", "/static/**", "/index.html").permitAll();
-                    req.requestMatchers(HttpMethod.POST, "/eventos").hasRole("ADMIN");
-                    req.requestMatchers(HttpMethod.DELETE, "/eventos/**").hasRole("ADMIN");
-                    req.requestMatchers("/dashboard/**").hasRole("ADMIN");
+                    req.requestMatchers("/admin/**", "/favicon.svg", "/icons.svg", "/assets/**", "/error").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/login").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/eventos").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/api/eventos/**").hasRole("ADMIN");
+                    req.requestMatchers("/api/dashboard/**").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new Argon2PasswordHasher();
     }
 }
