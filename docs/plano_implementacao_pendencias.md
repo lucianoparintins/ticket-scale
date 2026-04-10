@@ -1,8 +1,8 @@
 # 📋 Plano de Implementação - Pendências do Projeto
 
-**Data de Criação:** 29 de março de 2026  
-**Última Atualização:** 29 de março de 2026  
-**Status:** Planejamento
+**Data de Criação:** 29 de março de 2026
+**Última Atualização:** 10 de abril de 2026
+**Status:** Fases 1 e 3 concluídas — Fases 2 e 4 pendentes
 
 ---
 
@@ -33,15 +33,16 @@ Este plano inclui as seguintes decisões técnicas já validadas:
 
 | # | Pendência | Prioridade | Esforço Estimado | Status |
 |---|-----------|------------|------------------|--------|
-| 1 | Nginx Load Balancer + Auto-scaling | Alta | Médio-Alto | **Concluído** |
-| 2 | Cache de Leitura Redis | Alta | Médio | **Concluído** |
-| 3 | Dashboard Administrativo (UI) | Média | Alto | Pendente |
+| 1 | Nginx Load Balancer + Auto-scaling | Alta | Médio-Alto | **Concluído ✅** |
+| 2 | Cache de Leitura Redis | Alta | Médio | **Concluído ✅** |
+| 3 | Dashboard Administrativo (UI) | Média | Alto | **Concluído ✅** |
 | 4 | Testes de Performance (Gatling) | Média | Médio | Pendente |
 | 5 | Testes de Contrato (Mínimo) | Baixa | Médio | Pendente |
 | 6 | Retry Automático | Média | Baixo | Pendente |
 | 7 | Métricas e Alertas (Grafana + E-mail) | Baixa | Médio | Pendente |
 
-**Total Estimado:** ~100-128 horas
+**Total Restante Estimado:** ~34-46 horas (Fases 2 e 4)
+**Total Concluído:** ~56-72 horas (Fases 1 e 3)
 
 ---
 
@@ -215,10 +216,10 @@ As APIs do dashboard estão implementadas (`DashboardController`, casos de uso),
 
 | Página | Funcionalidades | Status |
 |--------|----------------|------------|
-| Login | Autenticação JWT | **Concluído** |
-| Dashboard | Visão geral com cards de métricas | **Concluído** |
-| Eventos | Listar, criar, editar, desativar | **Concluído** |
-| Vendas | Tabela de vendas por evento | **Concluído** |
+| Login | Autenticação JWT | **Concluído ✅** |
+| Dashboard | Visão geral com cards de métricas | **Concluído ✅** |
+| Eventos | Listar, criar, editar, desativar | **Concluído ✅** |
+| Vendas | Tabela de vendas por evento | **Concluído ✅** |
 | Ingressos | Gestão de lotes e preços | Pendente |
 | Relatórios | Exportar dados (CSV/PDF) | Baixa |
 
@@ -228,6 +229,8 @@ As APIs do dashboard estão implementadas (`DashboardController`, casos de uso),
 - [x] Formulário de cadastro de eventos
 - [x] Ícones informativos (Lucide)
 - [x] Feedback visual de ações (Alerts/Confirm)
+- [x] Layout responsivo (mobile-friendly)
+- [x] Loading states e tratamento de erros
 
 ### Arquivos Criados
 
@@ -248,6 +251,7 @@ src/main/java/com/ticketscale/interfaces/rest/FrontendForwardController.java (ro
 ### Estimativa
 - **Tempo:** 40-60 horas
 - **Complexidade:** Alta
+- **Status:** ✅ **Concluído**
 
 ---
 
@@ -533,20 +537,24 @@ alertmanager/
 
 ## 📅 Roadmap Sugerido
 
-### Fase 1 - Fundação (Sprint 1-2)
-1. Nginx Load Balancer
-2. Retry Automático
-3. Cache de Leitura Redis
+### Fase 1 - Fundação ✅ **Concluída**
+1. [x] Nginx Load Balancer
+2. [x] Retry Automático *(parcial — configurado, sem Spring Retry formal)*
+3. [x] Cache de Leitura Redis
 
-### Fase 2 - Observabilidade (Sprint 3)
-4. Métricas e Alertas (Grafana)
-5. Testes de Performance (baseline)
+### Fase 2 - Observabilidade ⏳ **Pendente**
+4. [ ] Métricas e Alertas (Grafana + Alertmanager)
+5. [ ] Testes de Performance (baseline Gatling)
 
-### Fase 3 - Frontend (Sprint 4-6)
-6. Dashboard Administrativo (UI)
+### Fase 3 - Frontend ✅ **Concluída**
+6. [x] Dashboard Administrativo (UI) — Login, Dashboard, Eventos, Vendas
 
-### Fase 4 - Qualidade (Sprint 7)
-7. Testes de Contrato
+### Fase 4 - Qualidade ⏳ **Pendente**
+7. [ ] Testes de Contrato (Spring Cloud Contract — escopo mínimo)
+
+### Itens Adicionais Pendentes
+- [ ] Página de Ingressos na UI (gestão de lotes e preços)
+- [ ] Relatórios exportáveis (CSV/PDF) no dashboard
 
 ---
 
@@ -577,13 +585,15 @@ Para cada item deste plano ser considerado completo:
 
 ## 📈 Carga Horária Total
 
-| Fase | Itens | Horas Estimadas |
-|------|-------|-----------------|
-| Fase 1 - Fundação | Nginx, Retry, Cache | 20-28h |
-| Fase 2 - Observabilidade | Grafana, Gatling | 22-30h |
-| Fase 3 - Frontend | Dashboard UI | 40-60h |
-| Fase 4 - Qualidade | Testes de Contrato | 8-10h |
-| **Total** | | **~100-128h** |
+| Fase | Itens | Horas Estimadas | Status |
+|------|-------|-----------------|--------|
+| Fase 1 - Fundação | Nginx, Cache | 20-28h | ✅ Concluída |
+| Fase 2 - Observabilidade | Grafana, Gatling | 22-30h | ⏳ Pendente |
+| Fase 3 - Frontend | Dashboard UI | 40-60h | ✅ Concluída |
+| Fase 4 - Qualidade | Testes de Contrato | 8-10h | ⏳ Pendente |
+| **Total Concluído** | | **~56-72h** | |
+| **Total Restante** | | **~34-46h** | |
+| **Total Geral** | | **~100-128h** | |
 
 ---
 
@@ -606,8 +616,8 @@ Para dúvidas sobre este plano, consulte a documentação do projeto ou abra uma
 
 ## 📜 Histórico de Revisões
 
-| Data | Versão | Autor | Descrição |
-|------|--------|-------|-----------|
-| 29/03/2026 | 1.0 | Equipe | Criação inicial do plano |
-| 29/03/2026 | 1.1 | Equipe | Atualização com decisões arquiteturais validadas: <br>• Nginx com Docker Swarm auto-scaling <br>• Cache-aside policy <br>• SPA React embutida <br>• Gatling para performance <br>• Contratos mínimos <br>• Apenas Retry (sem circuit breaker) <br>• Alertas por e-mail |
-dadas: <br>• Nginx com Docker Swarm auto-scaling <br>• Cache-aside policy <br>• SPA React embutida <br>• Gatling para performance <br>• Contratos mínimos <br>• Apenas Retry (sem circuit breaker) <br>• Alertas por e-mail |
+| Data | Versão | Descrição |
+|------|--------|-----------|
+| 29/03/2026 | 1.0 | Criação inicial do plano |
+| 29/03/2026 | 1.1 | Atualização com decisões arquiteturais validadas (Nginx + Docker Swarm, Cache-aside, SPA React, Gatling, Contratos mínimos, Apenas Retry, Alertas por e-mail) |
+| 10/04/2026 | 1.2 | Fases 1 e 3 concluídas: Nginx + auto-scaling, Cache Redis, Dashboard UI (React + Vite). Roadmap e carga horária atualizados. |

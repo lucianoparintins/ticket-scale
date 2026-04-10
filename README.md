@@ -195,10 +195,35 @@ Workers (processamento assíncrono)
 ## 📂 Estrutura do Projeto
 ```
 src/main/java/com/ticketscale
-├── domain
-├── application
-├── infrastructure
-├── interfaces
+├── domain/                     # Entidades, value objects, enums, eventos de domínio
+│   ├── evento/                 #   Evento, PeriodoEvento, EventoRepository
+│   ├── reserva/                #   Ingresso, Lote, Reserva, Status*, Repositories
+│   ├── pagamento/              #   Pagamento, DadosMetodoPagamento (sealed), Gateways
+│   ├── dashboard/              #   MetricaVendas, RelatorioReceita, MetricasDashboard
+│   ├── usuario/                #   Usuario, PasswordHasher, Papel
+│   └── event/                  #   Domain events (ReservaCriada, PagamentoConfirmado...)
+├── application/                # Casos de uso e serviços de aplicação
+│   ├── usecase/                #   ProcessarPagamento, ReservarIngresso, Dashboard...
+│   ├── evento/                 #   EventoService
+│   ├── reserva/                #   LoteService
+│   ├── usuario/                #   AutenticacaoService
+│   └── port/out/               #   LockManager, CacheManager, EventPublisher, GatewayPagamento
+├── infrastructure/             # Implementações técnicas
+│   ├── config/                 #   CacheConfig, RabbitMQConfig, WebConfig
+│   ├── logging/                #   LoggingFilter (MDC)
+│   ├── security/               #   Argon2PasswordHasher, SecurityFilter, TokenService
+│   ├── persistence/            #   JPA Repositories, DashboardRepositoryImpl
+│   ├── redis/                  #   RedisLockManager, RedisCacheManagerImpl
+│   ├── pagamento/              #   Gateway implementations (mocks)
+│   └── messaging/              #   RabbitMQEventPublisher, Listeners
+├── interfaces/                 # Controllers REST e DTOs
+│   └── rest/                   #   Autenticacao, Evento, Reserva, Pagamento, Dashboard...
+
+frontend/                       # SPA React + TypeScript + Vite (Dashboard Admin)
+src/main/resources/static/admin/#   Build final do frontend (servida pelo Spring Boot)
+
+nginx/                          # Configurações Nginx (load balancer + reverse proxy)
+scripts/                        # Scripts de automação (quality-reports, auto-scale)
 ```
 
 ## 📊 Qualidade de Software
@@ -356,25 +381,29 @@ docker compose stop sonarqube
 
 ### Implementado
 - [x] Módulo de autenticação (JWT) e testes automatizados
-- [x] Hashing de senhas seguro com Argon2id
+- [x] Hashing de senhas seguro com Argon2id + PEPPER
 - [x] CRUD de eventos (Admin e Cliente)
-- [x] Sistema de reserva com Redis
-- [x] Integração com RabbitMQ
-- [x] Worker de processamento
-- [x] Qualidade de Software (JaCoCo, Checkstyle, CI/CD, SonarCloud)
+- [x] Sistema de reserva com Redis (lock distribuído)
+- [x] Integração com RabbitMQ (listeners assíncronos)
+- [x] Worker de processamento (expiração de reservas, notificações, invalidação de cache)
+- [x] Qualidade de Software (JaCoCo, Checkstyle, PMD, OWASP, SonarQube Local, CI/CD)
 - [x] Logs estruturados com MDC e correlation ID
-- [x] Spring Actuator e Micrometer para métricas
+- [x] Spring Actuator e Micrometer Prometheus para métricas
 - [x] Refatoração para Builder Pattern nas entidades
-- [x] Módulo de pagamentos online (Pix, Débito e Crédito)
-- [x] Dashboard administrativo (APIs e UI React)
+- [x] Módulo de pagamentos online (Pix, Débito e Crédito) com Strategy Pattern
+- [x] Dashboard administrativo — APIs (métricas, receita, vendas por evento)
+- [x] Dashboard administrativo — UI (SPA React + TypeScript + Vite embutida)
 - [x] Nginx Load Balancer com auto-scaling (Docker Swarm)
+- [x] Cache de leitura com Redis (política Cache-aside)
+- [x] Testcontainers para testes de integração com PostgreSQL real
 
 ### Pendente
-- [ ] Cache de leitura com Redis (Cache-aside)
 - [ ] Testes de performance (Gatling)
-- [ ] Testes de contrato (Spring Cloud Contract)
-- [ ] Retry automático para falhas transitórias
-- [ ] Métricas e alertas (Grafana + E-mail)
+- [ ] Testes de contrato (Spring Cloud Contract — escopo mínimo)
+- [ ] Retry automático para falhas transitórias (Spring Retry)
+- [ ] Métricas e alertas (Grafana + Alertmanager por e-mail)
+- [ ] Gestão de ingressos e preços pela UI (página de Ingressos)
+- [ ] Relatórios exportáveis (CSV/PDF)
 
 ---
 

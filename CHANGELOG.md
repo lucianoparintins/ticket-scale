@@ -7,170 +7,82 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Adicionado
-- **Dashboard Administrativo (UI):**
-  - SPA React embutida com Vite e TypeScript no root `/frontend`.
-  - Build automatizado para `src/main/resources/static/admin`.
-  - Interface de Login com autenticação JWT integrada.
-  - Visão geral com métricas de vendas, receita e conversão.
-  - Gestão de Eventos (Listagem, Criação e Desativação).
-  - Relatório detalhado de Vendas por Evento.
-  - Configuração de roteamento SPA no Spring Boot via `FrontendForwardController`.
-  - Atualização das configurações de segurança para permitir acesso aos recursos estáticos do admin.
-  - Estilização com Vanilla CSS seguindo as diretrizes do `GEMINI.md`.
+- **Cache de Leitura com Redis (Política Cache-aside):**
+  - Interface `CacheManager` na camada de aplicação para desacoplamento.
+  - Implementação `RedisCacheManagerImpl` na infraestrutura usando Spring Cache (`@Cacheable`, `@CacheEvict`).
+  - TTLs customizados: Eventos (5 min), Lotes (2 min), Dashboard (10 min).
+  - Listener `CacheInvalidationListener` para invalidação distribuída via RabbitMQ (`CacheInvalidadoEvent`).
+  - Testes de integração: `EventoCacheIntegrationTest`, `EventoControllerRedisCacheIT`.
+- **Dashboard Administrativo — UI Completa:**
+  - SPA React + TypeScript + Vite no diretório `/frontend`, com build para `src/main/resources/static/admin`.
+  - Páginas: Login (JWT), Dashboard (métricas), Eventos (CRUD), Vendas (relatório por evento).
+  - `FrontendForwardController` para roteamento SPA no Spring Boot.
+  - Autenticação JWT integrada via `AuthContext` e `ProtectedRoute`.
+  - Estilização com Vanilla CSS seguindo diretrizes do `GEMINI.md`.
+- **Testcontainers para Testes de Integração:**
+  - PostgreSQL real via Docker para testes de integração (`Testcontainers` + `@ServiceConnection`).
+  - `DashboardRepositoryPostgresIT` validando consultas JPQL em banco real.
+  - Perfil `redis-it` com configuração dedicada (`application-redis-it.yml`).
 
 ### Corrigido
 - **Configuração de Ambiente (Docker):**
-  - Ajuste no `application-dev.yml` para utilizar variáveis de ambiente com valores padrão (fallback para localhost). Isso permite que a aplicação se conecte corretamente aos serviços (PostgreSQL, Redis, RabbitMQ) tanto localmente quanto via Docker Compose.
+  - `application-dev.yml` com variáveis de ambiente e valores padrão (fallback para localhost), permitindo conexão correta aos serviços via Docker Compose ou localmente.
 
-### Added
-- **Cache de Leitura com Redis (Política Cache-aside):**
-  - Implementação de cache distribuído para reduzir latência e carga no banco de dados.
-  - Interface `CacheManager` na camada de aplicação para desacoplamento.
-  - Implementação `RedisCacheManagerImpl` na infraestrutura usando Spring Cache.
-  - Configuração de TTLs customizados por entidade:
-    - Eventos: 5 minutos.
-    - Lotes: 2 minutos.
-    - Dashboard: 10 minutos.
-  - Prefixação de chaves com `ticketscale:` para organização no Redis.
-  - Serialização JSON (Jackson) para compatibilidade e legibilidade.
-  - Cache aplicado em:
-    - `EventoService`: Listagem de ativos e busca por ID.
-    - Dashboard: Métricas consolidadas, receita total e vendas por evento.
-  - Estratégia de invalidação (`@CacheEvict`) ao criar, atualizar ou desativar eventos.
-- **Nginx Load Balancer com Auto-scaling (Fase 1 - Fundação):**
-  - Configuração completa do Nginx como load balancer e reverse proxy.
-  - Load balancing com algoritmo `least_conn` para distribuição inteligente de requisições.
-  - Rate limiting configurado: 100 req/s (geral) e 10 req/s (autenticação).
-  - Health checks para API e Nginx.
-  - Suporte a arquivos estáticos para dashboard administrativo.
-  - Configurações separadas para desenvolvimento e produção.
-  - **Docker Swarm:**
-    - `docker-compose.prod.yml` com configuração para Swarm mode.
-    - DNS round-robin para descoberta automática de instâncias da API.
-    - Auto-scaling manual e automático (2-10 réplicas).
-    - Script `auto-scale.sh` para scaling baseado em CPU/Memory.
-    - Recursos limitados por container (CPU, memória).
-  - **Dockerfile:**
-    - Build em multi-stage para imagem otimizada.
-    - Usuário não-root para segurança.
-    - Health checks integrados.
-    - Otimizações JVM para containers.
-  - **Documentação:**
-    - README detalhado no diretório `nginx/`.
-    - `.env.example` com variáveis de ambiente para produção.
-    - Atualização do README principal com instruções de deploy.
-  - **Segurança:**
-    - Headers de segurança (X-Frame-Options, X-Content-Type-Options, etc.).
-    - Rate limiting para proteção contra DDoS básico.
-  - Arquivos criados: `nginx/nginx.conf`, `nginx/upstream.conf`, `nginx/conf.d/default.conf`, `nginx/nginx.prod.conf`, `docker-compose.prod.yml`, `Dockerfile`, `scripts/auto-scale.sh`.
-- **Configuração de Testes:**
-  - Adição da anotação `@ActiveProfiles("test")` nas classes `TicketScaleApplicationTests` e `SegurancaTest` para garantir o uso das configurações de teste.
-  - Atualização do `src/test/resources/application.yml` com configurações locais (localhost) para Redis e RabbitMQ e desabilitação do auto-startup do listener RabbitMQ durante os testes.
-- **Documentação de Planejamento:**
-  - Criação do `docs/plano_implementacao_pendencias.md` com plano detalhado para implementação das pendências do projeto.
-  - Documento inclui 7 pendências identificadas na análise do README.md.
-  - Definição de 8 decisões arquiteturais validadas (Nginx + Docker Swarm, Cache-aside, SPA Embutida, Gatling, Contratos Mínimos, Apenas Retry, Alertas por E-mail).
-  - Estimativa de carga horária total: ~100-128 horas distribuídas em 4 fases.
-  - Matriz de riscos e definição de pronto (DoD) para cada item.
-- **Convenções de Desenvolvimento:**
-  - Adição de diretriz no `GEMINI.md` para uso de **ripgrep (`rg`)** ao invés de `grep` para buscas no código-fonte.
-  - Ripgrep é mais rápido e respeita automaticamente arquivos `.gitignore`.
-  - Exemplos de uso adicionados: busca por classe, padrão regex, filtro por tipo, glob pattern e contexto.
-- **Dashboard Administrativo (Fase 6):**
-  - Implementação de endpoints para relatórios e métricas de vendas (exclusivo para `ADMIN`).
-  - Camada de domínio: Records `MetricaVendas`, `RelatorioReceita`, `FiltroDashboard` e `MetricasDashboard`.
-  - Interface `DashboardRepository` no domínio para desacoplamento.
-  - Implementação `DashboardRepositoryImpl` na infraestrutura usando **JPQL dinâmico** com `EntityManager` para consultas complexas e agregações (`SUM`, `COUNT`, `GROUP BY`).
-  - Casos de uso: `GerarRelatorioVendasPorEvento`, `CalcularReceitaTotal` e `ObterMetricasDashboard`.
-  - Endpoints REST em `DashboardController`:
-    - `GET /dashboard/vendas-por-evento`: Vendas agrupadas por evento com filtros de data.
-    - `GET /dashboard/receita-total`: Cálculo de receita no período selecionado.
-    - `GET /dashboard/metricas`: Visão consolidada com receita, ingressos vendidos e **taxa de conversão**.
-  - Configuração de segurança no `SecurityConfigurations` para restringir acesso ao dashboard apenas para perfis administrativos.
-  - Testes unitários para todos os novos casos de uso com Mockito.
-  - Teste de controller com `WebMvcTest` validando JSON de resposta e mapeamento de parâmetros.
-- **Módulo de Pagamento de Ingressos (Fase 4):**
-  - Implementação do fluxo de pagamento seguindo Clean Architecture, SOLID e DDD.
-  - Suporte a 3 métodos de pagamento: **Pix**, **Cartão de Débito** e **Cartão de Crédito**.
-  - Design baseado em **Strategy pattern** com `GatewayPagamentoResolver` para seleção de gateways.
-  - **Inversão de Dependência (DIP)**: `PagamentoRepository` como interface pura no domínio, com implementação JPA na infraestrutura.
-  - Caso de uso `ProcessarPagamentoUseCase` com **lock distribuído (Redis)** para garantir idempotência e evitar race conditions.
-  - Sealed interface `DadosMetodoPagamento` (Java 25) para eliminação de campos nulos e validação por tipo (pattern matching).
-  - Entidade de domínio `Pagamento` com ciclo de vida (`PENDENTE`, `APROVADO`, `RECUSADO`).
-  - Evento de domínio `PagamentoConfirmadoEvent` integrado ao RabbitMQ via `EventPublisher`.
-  - Mocks de gateways (`MockGatewayPix`, `MockGatewayCartaoDebito`, `MockGatewayCartaoCredito`) para desenvolvimento e testes.
-  - Tratamento de exceções centralizado com `PagamentoExceptionHandler` mapeando erros de domínio para códigos HTTP.
-  - Testes unitários abrangentes para domínio, aplicação e infraestrutura.
-  - Teste de controller com `@WebMvcTest` para validação de payload e respostas REST.
-- **Fase 2 e 3 - Melhorias de Qualidade e Código:**
-  - Logs estruturados com MDC e correlation ID (`LoggingFilter`).
-  - Configuração do Logback com padrão estruturado (`logback-spring.xml`).
-  - Spring Boot Actuator para health checks e métricas.
-  - Micrometer com Prometheus para monitoramento.
-  - Refatoração das entidades para Builder Pattern (`Evento`, `Reserva`, `Ingresso`, `Lote`).
-  - Validações reforçadas nos builders das entidades.
-  - Endpoints de actuator: `/actuator/health`, `/actuator/metrics`, `/actuator/prometheus`.
-- **Qualidade de Software e CI/CD:**
-  - Unificação dos pacotes de portas da aplicação: `application.ports` removido e `LockManager` movido para `application.port.out`.
-  - Configuração do JaCoCo para relatórios de cobertura de testes (HTML/XML).
+### Alterado
+- Unificação das seções "Adicionado" e "Added" do CHANGELOG para organização consistente.
+- Refatoração de código para remoção de imports não utilizados em classes de infraestrutura e suítes de teste.
+- `RabbitMQConfig` ajustado para utilizar `JacksonJsonMessageConverter`.
+- Perfis de aplicação reorganizados: `dev` (padrão) e `prod` (variáveis de ambiente).
 
-  - Integração do Checkstyle para padronização de código Java.
-  - **PMD** para análise estática de bugs e más práticas.
-  - **SonarQube Local** (via Docker) como alternativa ao SonarCloud.
-  - Pipeline de CI/CD com GitHub Actions (`.github/workflows/ci.yml`).
-  - OWASP Dependency Check para segurança de dependências.
-  - Script de automação de relatórios (`scripts/quality-reports.sh`).
-  - Documentação do plano de melhoria de qualidade em `docs/plano_melhoria_qualidade.md`.
-  - Dashboard de qualidade em `docs/quality-dashboard.md`.
-- Plano de implementação da tecnologia de Pagamentos (`docs/implementation_plan_pagamentos.md`) revisado e adequado aos princípios de Clean Architecture, DDD, SOLID e concorrência (lock distribuído).
-- Habilitação de Virtual Threads do Java 25 no Spring Boot (`spring.threads.virtual.enabled: true`).
-- Integração com RabbitMQ (Fase 5):
-  - Porta `EventPublisher` na camada de aplicação.
-  - Evento de domínio `ReservaCriadaEvent`.
-  - Configuração da infraestrutura via `RabbitMQConfig`.
-  - Implementação `RabbitMQEventPublisher`.
-  - Listeners para processamento em background (`ExpiracaoReservaListener` e `NotificacaoListener`).
-  - Testes unitários e de integração para mensageria (`RabbitMQEventPublisherTest`, `RabbitMQIntegrationTest`, etc).
-- Adição de exemplos de código para testes unitários, testes de controller (WebMvcTest) e de integração no `GEMINI.md`.
-- Sistema de Reserva de Ingressos com Redis:
-  - Entidades de domínio: `Ingresso`, `Lote`, `Reserva` com enums `StatusIngresso` e `StatusReserva`.
-  - Repositórios de domínio: `IngressoRepository`, `LoteRepository`, `ReservaRepository`.
-  - Interface `LockManager` na camada de aplicação (porta para lock distribuído).
-  - `ReservarIngressoUseCase` na camada de aplicação com lock distribuído via Redis.
-  - `RedisLockManager` na camada de infraestrutura (implementação do `LockManager` com `RedisTemplate`).
-  - `ReservaController` com endpoint para criar reservas.
-  - DTOs: `ReservaRequestDTO` e `ReservaResponseDTO`.
-  - Testes unitários para `ReservarIngressoUseCase`, `Ingresso` e `Reserva`.
-  - Teste de controller para `ReservaController` com `@WebMvcTest`.
-  - Teste de integração `ReservarIngressoIntegrationTest` com `@SpringBootTest`.
-- Módulo de CRUD de Eventos:
-  - Entidade `Evento` e Value Object `PeriodoEvento` na camada de domínio.
-  - Interface `EventoRepository` e implementação JPA na infraestrutura.
-  - `EventoService` na camada de aplicação para orquestrar as operações de negócio.
-  - `EventoController` com endpoints para criar, listar, detalhar e desativar eventos.
-  - Controle de acesso por perfil: criação e remoção restritas a `ROLE_ADMIN`.
-  - Testes unitários para `EventoService` e `EventoController`.
-- Hashing de senhas com Argon2id:
-  - Interface `PasswordHasher` na camada de domínio.
-  - Implementação `Argon2PasswordHasher` na camada de infraestrutura (Argon2id, iterations=3, memory=64MB, parallelism=1).
-  - Suporte a PEPPER via variável de ambiente `PASSWORD_PEPPER`.
-  - Integração nativa com Spring Security (`Argon2PasswordHasher` implementa `PasswordEncoder`).
-  - Testes unitários para o novo mecanismo de hash (`Argon2PasswordHasherTest`).
-- Documentação de análise inicial do projeto e roadmap estratégico em `docs/analise_projeto_inicial.md`.
-- Configuração de perfis de aplicação:
-  - `application.yml`: Configurações comuns e ativação do perfil `dev` por padrão.
-  - `application-dev.yml`: Configurações locais (PostgreSQL, Redis, RabbitMQ em localhost).
-  - `application-prod.yml`: Configurações via variáveis de ambiente para produção.
-- Workflow de commit obrigatório:
-  - Exigência de atualização de `CHANGELOG.md`, `README.md` e `GEMINI.md` antes de cada commit.
+### Removido
+- OWASP Dependency Check do CI (`.github/workflows/ci.yml`) para reduzir tempo de execução. Scan disponível localmente via `./gradlew dependencyCheckAnalyze`.
 
-### Removed
-- OWASP Dependency Check do workflow de CI (`.github/workflows/ci.yml`) para reduzir o tempo de execução. O scan ainda está disponível para execução local via `./gradlew dependencyCheckAnalyze`.
+---
 
-### Changed
-- Refatoração de código para remoção de imports não utilizados em diversas classes de infraestrutura (`DashboardRepositoryImpl`, `SecurityConfigurations`, `TokenService`) e suítes de testes.
-- Ajuste na configuração do RabbitMQ (`RabbitMQConfig`) para utilizar `JacksonJsonMessageConverter` em conformidade com as dependências do projeto.
-- `application.yml` original: Decomposto nos perfis `dev` e `prod` para melhor gestão de ambientes.
+## [Implementações Anteriores]
+
+### Autenticação e Segurança
+- Módulo de autenticação com JWT e testes automatizados.
+- Hashing de senhas com Argon2id (iterations=3, memory=64MB, parallelism=1).
+- Suporte a PEPPER via variável de ambiente `PASSWORD_PEPPER`.
+- Spring Security com `Argon2PasswordHasher` implementando `PasswordEncoder`.
+
+### Eventos e Reservas
+- CRUD completo de eventos com controle de acesso por perfil (`ROLE_ADMIN`).
+- Entidade `Evento` com Value Object `PeriodoEvento`.
+- Sistema de reserva com lock distribuído Redis (`RedisLockManager`).
+- Entidades `Ingresso`, `Lote`, `Reserva` com enums de status.
+- `ReservarIngressoUseCase` com aquisição de lock distribuído.
+
+### Módulo de Pagamento
+- 3 métodos: **Pix**, **Cartão de Débito**, **Cartão de Crédito**.
+- Strategy pattern com `GatewayPagamentoResolver`.
+- Sealed interface `DadosMetodoPagamento` (Java 25) para tipagem segura.
+- `ProcessarPagamentoUseCase` com lock distribuído para idempotência.
+- Evento de domínio `PagamentoConfirmadoEvent` via RabbitMQ.
+- Mocks de gateways para desenvolvimento e testes.
+- `PagamentoExceptionHandler` mapeando erros para HTTP.
+
+### Mensageria (RabbitMQ)
+- `EventPublisher` e `RabbitMQEventPublisher`.
+- Eventos: `ReservaCriadaEvent`, `PagamentoConfirmadoEvent`.
+- Listeners: `ExpiracaoReservaListener`, `NotificacaoListener`, `CacheInvalidationListener`.
+
+### Dashboard — APIs
+- Records de domínio: `MetricaVendas`, `RelatorioReceita`, `MetricasDashboard`.
+- `DashboardRepositoryImpl` com JPQL dinâmico (`EntityManager`).
+- Casos de uso: `GerarRelatorioVendasPorEvento`, `CalcularReceitaTotal`, `ObterMetricasDashboard`.
+- Endpoints: `/dashboard/vendas-por-evento`, `/dashboard/receita-total`, `/dashboard/metricas`.
+- Restrição de acesso a `ADMIN` via `SecurityConfigurations`.
+
+### Qualidade de Software e CI/CD
+- JaCoCo (cobertura ≥ 80%), Checkstyle, PMD, SonarQube Local.
+- Pipeline CI/CD com GitHub Actions.
+- Spring Actuator + Micrometer Prometheus.
+- Logs estruturados com MDC e correlation ID (`LoggingFilter`, `logback-spring.xml`).
+- Script `quality-reports.sh` para geração automatizada de relatórios.
+- Refatoração para Builder Pattern em `Evento`, `Reserva`, `Ingresso`, `Lote`.
+- Virtual Threads do Java 25 habilitados (`spring.threads.virtual.enabled: true`).
 
 ## [0.0.1] - 2026-03-24
 

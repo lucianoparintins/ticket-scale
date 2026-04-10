@@ -135,21 +135,31 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 ## Key Files & Directories
 
-- `README.md`: High-level project documentation, architecture diagrams, and roadmap.
-- `GEMINI.md`: This file, providing context and instructions for AI-assisted development.
+- `README.md`: Documentação geral do projeto, arquitetura e roadmap.
+- `GEMINI.md`: Este arquivo — contexto e diretrizes para desenvolvimento com IA.
 - `CHANGELOG.md`: Registro de todas as alterações notáveis do projeto.
-- `build.gradle`: Configuração de dependências e plugins (Gradle).
-- `docker-compose.yml`: Infraestrutura local (PostgreSQL, Redis, RabbitMQ, **SonarQube**).
+- `build.gradle`: Configuração de dependências e plugins (Gradle, Spring Boot 4.0.4, Java 25).
+- `docker-compose.yml`: Infraestrutura local (PostgreSQL, Redis, RabbitMQ, Nginx, **SonarQube**).
+- `docker-compose.prod.yml`: Configuração para Docker Swarm (produção).
+- `Dockerfile`: Build multi-stage para imagem otimizada da API.
 - `.github/workflows/ci.yml`: Pipeline de CI/CD com GitHub Actions.
 - `config/checkstyle/checkstyle.xml`: Regras de padronização de código.
 - `config/pmd/ruleset.xml`: Regras de análise PMD.
-- `docs/plano_melhoria_qualidade.md`: Plano detalhado de melhoria de qualidade.
-- `docs/quality-dashboard.md`: Dashboard de relatórios de qualidade.
-- `scripts/quality-reports.sh`: Script de automação de relatórios.
+- `docs/plano_implementacao_pendencias.md`: Plano detalhado de pendências e progresso.
+- `scripts/quality-reports.sh`: Script de automação de relatórios de qualidade.
+- `scripts/auto-scale.sh`: Script de auto-scaling baseado em CPU/Memory (Docker Swarm).
+- `scripts/dev-up-local.sh`: Script para subir ambiente local rapidamente.
+- `nginx/`: Configurações do Nginx (load balancer + reverse proxy + static files).
+- `frontend/`: SPA React + TypeScript + Vite (código fonte do dashboard admin).
+- `src/main/resources/static/admin/`: Build final do frontend (servida pelo Spring Boot).
 - `src/main/java/com/ticketscale/`: Root package com as camadas:
-    - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`), **dashboard** (`MetricaVendas`, `RelatorioReceita`, `MetricasDashboard`), repositórios e `PasswordHasher`.
-    - `application/`: Casos de uso e portas (`EventoService`, `AutenticacaoService`, `ReservarIngressoUseCase`, **GerarRelatorioVendasPorEvento**, **CalcularReceitaTotal**, **ObterMetricasDashboard**, `LockManager`).
-    - `infrastructure/`: Implementações técnicas (JPA para `Usuario` e `Evento`, Redis (`RedisLockManager`), RabbitMQ, **Persistence/Dashboard** (`DashboardRepositoryImpl`), `Argon2PasswordHasher`, **LoggingFilter**, **Health Indicators**).
-    - `interfaces/`: Controllers REST (`AutenticacaoController`, `UsuarioController`, `EventoController`, `ReservaController`, **DashboardController**) e DTOs.
-- `src/main/resources/application.yml`: Configuração do Spring Boot.
+    - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`, `Pagamento`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`, `StatusPagamento`, `MetodoPagamento`), sealed interface (`DadosMetodoPagamento`), eventos de domínio (`ReservaCriadaEvent`, `PagamentoConfirmadoEvent`, `CacheInvalidadoEvent`), **dashboard** (`MetricaVendas`, `RelatorioReceita`, `MetricasDashboard`), repositórios e `PasswordHasher`.
+    - `application/`: Casos de uso (`ReservarIngressoUseCase`, `ProcessarPagamentoUseCase`, `GerarRelatorioVendasPorEvento`, `CalcularReceitaTotal`, `ObterMetricasDashboard`), serviços (`EventoService`, `AutenticacaoService`, `LoteService`), portas (`LockManager`, `CacheManager`, `EventPublisher`, `GatewayPagamento`, `GatewayPagamentoResolver`).
+    - `infrastructure/`: Implementações técnicas (JPA para `Usuario`, `Evento`, `Pagamento`; Redis (`RedisLockManager`, `RedisCacheManagerImpl`), RabbitMQ (`RabbitMQEventPublisher`, listeners), **Dashboard** (`DashboardRepositoryImpl` com JPQL dinâmico), `Argon2PasswordHasher`, **LoggingFilter** com MDC, **SecurityFilter**, **TokenService**, mock gateways de pagamento).
+    - `interfaces/`: Controllers REST (`AutenticacaoController`, `UsuarioController`, `EventoController`, `ReservaController`, `LoteController`, `PagamentoController`, `DashboardController`, `PagamentoExceptionHandler`) e DTOs.
+- `src/main/resources/application.yml`: Configuração comum do Spring Boot.
+- `src/main/resources/application-dev.yml`: Configurações para desenvolvimento (localhost com fallback).
+- `src/main/resources/application-prod.yml`: Configurações via variáveis de ambiente (produção).
 - `src/main/resources/logback-spring.xml`: Configuração de logs estruturados com MDC.
+- `src/main/resources/data.sql`: Dados iniciais para desenvolvimento.
+- `src/test/`: Testes unitários, de integração (Testcontainers) e de controller (`@WebMvcTest`).
