@@ -87,6 +87,8 @@ services:
       dockerfile: Dockerfile
     container_name: ticketscale-api
     restart: unless-stopped
+    ports:
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
       DB_URL: jdbc:postgresql://postgres:5432/ticketscale
@@ -98,7 +100,7 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USERNAME: ticketscale
       RABBITMQ_PASSWORD: ticketscale
-      PASSWORD_PEPPER: ${PASSWORD_PEPPER:-dev-pepper-change-in-prod}
+      PASSWORD_PEPPER: ${PASSWORD_PEPPER:-default_pepper}
     depends_on:
       - postgres
       - redis
