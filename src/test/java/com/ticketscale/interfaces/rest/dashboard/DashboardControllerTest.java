@@ -55,7 +55,7 @@ class DashboardControllerTest {
         var metrica = new MetricaVendas(UUID.randomUUID(), "Evento Teste", 10L, BigDecimal.valueOf(100));
         when(gerarRelatorioVendasPorEvento.executar(any())).thenReturn(List.of(metrica));
 
-        mockMvc.perform(get("/dashboard/vendas-por-evento"))
+        mockMvc.perform(get("/api/dashboard/vendas-por-evento"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].eventoNome").value("Evento Teste"))
                 .andExpect(jsonPath("$[0].ingressosVendidos").value(10));
@@ -67,7 +67,7 @@ class DashboardControllerTest {
         var relatorio = new RelatorioReceita(BigDecimal.valueOf(1000), 50, LocalDateTime.now(), LocalDateTime.now());
         when(calcularReceitaTotal.executar(any())).thenReturn(relatorio);
 
-        mockMvc.perform(get("/dashboard/receita-total"))
+        mockMvc.perform(get("/api/dashboard/receita-total"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(1000))
                 .andExpect(jsonPath("$.quantidadeVendas").value(50));
@@ -79,7 +79,7 @@ class DashboardControllerTest {
         var metricas = new MetricasDashboard(BigDecimal.valueOf(1000), 10L, List.of(), 0.8);
         when(obterMetricasDashboard.executar(any())).thenReturn(metricas);
 
-        mockMvc.perform(get("/dashboard/metricas"))
+        mockMvc.perform(get("/api/dashboard/metricas"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.receitaTotal").value(1000))
                 .andExpect(jsonPath("$.taxaConversao").value(0.8));

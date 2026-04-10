@@ -62,7 +62,7 @@ class EventoControllerTest {
                 }
                 """.formatted(dataInicio, dataFim);
 
-        mockMvc.perform(post("/eventos")
+        mockMvc.perform(post("/api/eventos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isCreated())
@@ -75,7 +75,7 @@ class EventoControllerTest {
     void deveRetornar400AoCadastrarEventoInvalido() throws Exception {
         var json = "{}";
 
-        mockMvc.perform(post("/eventos")
+        mockMvc.perform(post("/api/eventos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isBadRequest());

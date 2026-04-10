@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,7 +50,7 @@ class AutenticacaoControllerTest {
         
         var json = "{\"login\":\"login_correto\", \"senha\":\"senha_correta\"}";
         
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isOk())
@@ -63,7 +62,7 @@ class AutenticacaoControllerTest {
     void deveRetornar400QuandoJsonInvalido() throws Exception {
         var json = "{\"login\":\"\", \"senha\":\"\"}";
         
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isBadRequest());
@@ -75,12 +74,12 @@ class AutenticacaoControllerTest {
         when(manager.authenticate(any())).thenThrow(new BadCredentialsException("Credenciais inválidas"));
         
         var json = "{\"login\":\"login_errado\", \"senha\":\"senha_errada\"}";
-        
-        // No contexto de @WebMvcTest com filtros desativados, a exceção sobe direto.
-        assertThrows(Exception.class, () -> {
-            mockMvc.perform(post("/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json));
-        });
+
+        // O controller captura AuthenticationException e retorna 401.
+        mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.mensagem").value("Credenciais inválidas"));
     }
 }
