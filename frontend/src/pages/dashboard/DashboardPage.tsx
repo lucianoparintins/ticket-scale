@@ -3,15 +3,14 @@ import { api } from '../../services/api';
 import { TrendingUp, ShoppingCart, DollarSign, Users } from 'lucide-react';
 
 interface Metricas {
-  totalVendas: number;
-  totalReservas: number;
-  taxaConversao: number;
-  ticketMedio: number;
+  receitaTotal: number;
+  ingressosVendidos: number;
+  taxaConversao: number; // 0..1
 }
 
 const DashboardPage: React.FC = () => {
   const [metricas, setMetricas] = useState<Metricas | null>(null);
-  const [receita, setReceita] = useState<any>(null);
+  const [receita, setReceita] = useState<{ total: number; quantidadeVendas: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +33,10 @@ const DashboardPage: React.FC = () => {
 
   if (loading) return <div>Carregando...</div>;
 
+  const receitaTotal = receita?.total ?? metricas?.receitaTotal ?? 0;
+  const quantidadeVendas = receita?.quantidadeVendas ?? 0;
+  const ticketMedio = quantidadeVendas > 0 ? receitaTotal / quantidadeVendas : 0;
+
   return (
     <div>
       <h1 style={{ marginBottom: '2rem' }}>Dashboard</h1>
@@ -46,7 +49,7 @@ const DashboardPage: React.FC = () => {
             </div>
             <div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Receita Total</p>
-              <h3 style={{ fontSize: '1.5rem' }}>R$ {receita?.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+              <h3 style={{ fontSize: '1.5rem' }}>R$ {receitaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
             </div>
           </div>
         </div>
@@ -58,7 +61,7 @@ const DashboardPage: React.FC = () => {
             </div>
             <div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Vendas Totais</p>
-              <h3 style={{ fontSize: '1.5rem' }}>{metricas?.totalVendas}</h3>
+              <h3 style={{ fontSize: '1.5rem' }}>{quantidadeVendas}</h3>
             </div>
           </div>
         </div>
@@ -70,7 +73,7 @@ const DashboardPage: React.FC = () => {
             </div>
             <div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Taxa de Conversão</p>
-              <h3 style={{ fontSize: '1.5rem' }}>{(metricas?.taxaConversao || 0).toFixed(2)}%</h3>
+              <h3 style={{ fontSize: '1.5rem' }}>{(((metricas?.taxaConversao || 0) * 100)).toFixed(2)}%</h3>
             </div>
           </div>
         </div>
@@ -81,8 +84,8 @@ const DashboardPage: React.FC = () => {
               <Users size={24} />
             </div>
             <div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Reservas</p>
-              <h3 style={{ fontSize: '1.5rem' }}>{metricas?.totalReservas}</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Ticket Médio</p>
+              <h3 style={{ fontSize: '1.5rem' }}>R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
             </div>
           </div>
         </div>

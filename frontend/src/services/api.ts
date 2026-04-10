@@ -26,7 +26,7 @@ export const api = {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Erro na requisição');
+      throw new Error(errorData.mensagem || errorData.message || 'Erro na requisição');
     }
 
     return response.json();

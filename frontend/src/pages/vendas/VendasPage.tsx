@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
 
 interface VendaPorEvento {
-  nomeEvento: string;
-  quantidadeVendida: number;
-  valorTotal: number;
+  eventoId: string;
+  eventoNome: string;
+  ingressosVendidos: number;
+  receitaTotal: number;
 }
 
 const VendasPage: React.FC = () => {
@@ -48,9 +49,9 @@ const VendasPage: React.FC = () => {
           <tbody>
             {vendas.map((venda, index) => (
               <tr key={index}>
-                <td>{venda.nomeEvento}</td>
-                <td>{venda.quantidadeVendida}</td>
-                <td>{venda.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                <td>{venda.eventoNome}</td>
+                <td>{venda.ingressosVendidos}</td>
+                <td>{(venda.receitaTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
               </tr>
             ))}
             {vendas.length === 0 && (
@@ -63,9 +64,9 @@ const VendasPage: React.FC = () => {
             <tfoot>
               <tr>
                 <th style={{ backgroundColor: '#f8fafc' }}>Total</th>
-                <th style={{ backgroundColor: '#f8fafc' }}>{vendas.reduce((acc, v) => acc + v.quantidadeVendida, 0)}</th>
+                <th style={{ backgroundColor: '#f8fafc' }}>{vendas.reduce((acc, v) => acc + (v.ingressosVendidos ?? 0), 0)}</th>
                 <th style={{ backgroundColor: '#f8fafc' }}>
-                  {vendas.reduce((acc, v) => acc + v.valorTotal, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  {vendas.reduce((acc, v) => acc + (v.receitaTotal ?? 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </th>
               </tr>
             </tfoot>
