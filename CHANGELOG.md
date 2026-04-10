@@ -18,6 +18,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Atualização das configurações de segurança para permitir acesso aos recursos estáticos do admin.
   - Estilização com Vanilla CSS seguindo as diretrizes do `GEMINI.md`.
 
+### Corrigido
+- **Configuração de Ambiente (Docker):**
+  - Ajuste no `application-dev.yml` para utilizar variáveis de ambiente com valores padrão (fallback para localhost). Isso permite que a aplicação se conecte corretamente aos serviços (PostgreSQL, Redis, RabbitMQ) tanto localmente quanto via Docker Compose.
+
 ### Added
 - **Cache de Leitura com Redis (Política Cache-aside):**
   - Implementação de cache distribuído para reduzir latência e carga no banco de dados.

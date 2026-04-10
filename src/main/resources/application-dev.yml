@@ -5,9 +5,9 @@ spring:
 
   # --- Banco de Dados Local ---
   datasource:
-    url: jdbc:postgresql://localhost:5432/ticketscale
-    username: ticketscale
-    password: ticketscale
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketscale}
+    username: ${DB_USERNAME:ticketscale}
+    password: ${DB_PASSWORD:ticketscale}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -18,12 +18,12 @@ spring:
   # --- Redis Local ---
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   # --- RabbitMQ Local ---
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: ticketscale
-    password: ticketscale
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:ticketscale}
+    password: ${RABBITMQ_PASSWORD:ticketscale}
