@@ -2,7 +2,7 @@
 
 **Data de Criação:** 29 de março de 2026
 **Última Atualização:** 10 de abril de 2026
-**Status:** Fases 1 e 3 concluídas — Fases 2 e 4 pendentes
+**Status:** Frontend MVP concluído — Faltam telas de Gestão (Usuários, Lotes, Reservas, Pagamentos) e melhorias no Dashboard
 
 ---
 
@@ -35,14 +35,19 @@ Este plano inclui as seguintes decisões técnicas já validadas:
 |---|-----------|------------|------------------|--------|
 | 1 | Nginx Load Balancer + Auto-scaling | Alta | Médio-Alto | **Concluído ✅** |
 | 2 | Cache de Leitura Redis | Alta | Médio | **Concluído ✅** |
-| 3 | Dashboard Administrativo (UI) | Média | Alto | **Concluído ✅** |
+| 3 | Dashboard Administrativo (UI — MVP) | Média | Alto | **Concluído ✅** |
+| 3.1 | Tela de Gestão de Usuários | Média | Médio | Pendente |
+| 3.2 | Tela de Gestão de Lotes por Evento | Alta | Médio | Pendente |
+| 3.3 | Tela de Gestão de Reservas | Média | Médio | Pendente |
+| 3.4 | Tela de Histórico de Pagamentos | Baixa | Médio | Pendente |
+| 3.5 | Dashboard com Filtros e Gráficos | Média | Médio | Pendente |
 | 4 | Testes de Performance (Gatling) | Média | Médio | Pendente |
 | 5 | Testes de Contrato (Mínimo) | Baixa | Médio | Pendente |
 | 6 | Retry Automático | Média | Baixo | Pendente |
 | 7 | Métricas e Alertas (Grafana + E-mail) | Baixa | Médio | Pendente |
 
-**Total Restante Estimado:** ~34-46 horas (Fases 2 e 4)
-**Total Concluído:** ~56-72 horas (Fases 1 e 3)
+**Total Restante Estimado:** ~72-102 horas
+**Total Concluído:** ~56-72 horas (Fases 1 e 3 — MVP)
 
 ---
 
@@ -212,25 +217,34 @@ As APIs do dashboard estão implementadas (`DashboardController`, casos de uso),
 - CDN-ready no futuro se houver necessidade de escala global
 - Menor complexidade operacional
 
-#### 3.2 Páginas a Implementar
+#### 3.2 Páginas Implementadas (MVP)
 
 | Página | Funcionalidades | Status |
 |--------|----------------|------------|
 | Login | Autenticação JWT | **Concluído ✅** |
 | Dashboard | Visão geral com cards de métricas | **Concluído ✅** |
-| Eventos | Listar, criar, editar, desativar | **Concluído ✅** |
-| Vendas | Tabela de vendas por evento | **Concluído ✅** |
-| Ingressos | Gestão de lotes e preços | Pendente |
-| Relatórios | Exportar dados (CSV/PDF) | Baixa |
+| Eventos | Listar, criar, desativar | **Concluído ✅** |
+| Vendas | Tabela de vendas por evento (agregado) | **Concluído ✅** |
 
-#### 3.3 Componentes Visuais
-- [x] Cards de métricas (receita, vendas, conversão)
-- [x] Tabela de eventos com paginação
-- [x] Formulário de cadastro de eventos
-- [x] Ícones informativos (Lucide)
-- [x] Feedback visual de ações (Alerts/Confirm)
-- [x] Layout responsivo (mobile-friendly)
-- [x] Loading states e tratamento de erros
+#### 3.2.1 Páginas Pendentes (Gestão)
+
+| Página | Rota | Funcionalidades | Endpoints Backend Necessários |
+|--------|------|-----------------|-------------------------------|
+| **Usuários** | `/admin/usuarios` | Listar, cadastrar, editar papel, desativar | `GET /api/usuarios`, `GET /api/usuarios/{id}`, `PUT /api/usuarios/{id}`, `DELETE /api/usuarios/{id}` |
+| **Detalhe do Evento + Lotes** | `/admin/eventos/:id` | Ver detalhes, CRUD de lotes (criar, editar, desativar) | `PUT /api/eventos/{id}`, `POST /api/eventos/{eventoId}/lotes`, `GET /api/eventos/{eventoId}/lotes`, `DELETE /api/v1/lotes/{id}` |
+| **Reservas** | `/admin/reservas` | Listar todas as reservas, filtrar por evento/status, ver detalhes | `GET /api/v1/reservas`, `GET /api/v1/reservas/{id}`, `PUT /api/v1/reservas/{id}` |
+| **Pagamentos** | `/admin/pagamentos` | Histórico de pagamentos, status (aprovado/recusado), detalhes | `GET /api/v1/pagamentos`, `GET /api/v1/pagamentos/{id}` |
+
+#### 3.2.2 Melhorias Pendentes nas Páginas Existentes
+
+| Página | Melhoria | Detalhe |
+|--------|----------|---------|
+| Dashboard | Filtros por período | Backend já suporta `dataInicio`, `dataFim`, `eventoId` — frontend não envia |
+| Dashboard | Gráficos temporais | Linha de receita ao longo do tempo, barras de vendas por dia |
+| Eventos | Edição de evento | Adicionar formulário de edição (requer `PUT /api/eventos/{id}` no backend) |
+| Vendas | Drill-down por reserva | Clicar em uma linha e ver reservas individuais daquele evento |
+| Geral | Toasts/notificações | Adicionar biblioteca de notificações (ex: react-hot-toast) |
+| Geral | Loading states | Spinners e skeletons em todas as páginas |
 
 ### Arquivos Criados
 
@@ -539,22 +553,34 @@ alertmanager/
 
 ### Fase 1 - Fundação ✅ **Concluída**
 1. [x] Nginx Load Balancer
-2. [x] Retry Automático *(parcial — configurado, sem Spring Retry formal)*
-3. [x] Cache de Leitura Redis
+2. [x] Cache de Leitura Redis
 
 ### Fase 2 - Observabilidade ⏳ **Pendente**
-4. [ ] Métricas e Alertas (Grafana + Alertmanager)
-5. [ ] Testes de Performance (baseline Gatling)
+3. [ ] Métricas e Alertas (Grafana + Alertmanager)
+4. [ ] Testes de Performance (baseline Gatling)
 
-### Fase 3 - Frontend ✅ **Concluída**
-6. [x] Dashboard Administrativo (UI) — Login, Dashboard, Eventos, Vendas
+### Fase 3 - Frontend ✅ **MVP Concluído**
+5. [x] Dashboard UI — Login, Dashboard, Eventos, Vendas
+
+### Fase 3.1 - Frontend (Gestão Completa) ⏳ **Pendente**
+6. [ ] Tela de Gestão de Usuários (`/admin/usuarios`)
+7. [ ] Tela de Detalhe do Evento + Lotes (`/admin/eventos/:id`)
+8. [ ] Tela de Gestão de Reservas (`/admin/reservas`)
+9. [ ] Tela de Histórico de Pagamentos (`/admin/pagamentos`)
+10. [ ] Dashboard com Filtros e Gráficos
 
 ### Fase 4 - Qualidade ⏳ **Pendente**
-7. [ ] Testes de Contrato (Spring Cloud Contract — escopo mínimo)
+11. [ ] Testes de Contrato (Spring Cloud Contract — escopo mínimo)
 
-### Itens Adicionais Pendentes
-- [ ] Página de Ingressos na UI (gestão de lotes e preços)
-- [ ] Relatórios exportáveis (CSV/PDF) no dashboard
+### Dependências: Backend Necessário para Telas de Gestão
+
+| Recurso | Endpoints Faltantes no Backend |
+|---------|-------------------------------|
+| Evento | `PUT /api/eventos/{id}` (editar) |
+| Lote | `POST /api/eventos/{eventoId}/lotes` (criar), `GET /api/eventos/{eventoId}/lotes` (listar por evento), `DELETE /api/v1/lotes/{id}` (desativar) |
+| Reserva | `GET /api/v1/reservas` (listar), `GET /api/v1/reservas/{id}` (detalhar), `PUT /api/v1/reservas/{id}` (atualizar status) |
+| Pagamento | `GET /api/v1/pagamentos` (listar), `GET /api/v1/pagamentos/{id}` (detalhar) |
+| Usuário | `GET /api/usuarios` (listar), `GET /api/usuarios/{id}` (detalhar), `PUT /api/usuarios/{id}` (editar), `DELETE /api/usuarios/{id}` (desativar) |
 
 ---
 
@@ -566,6 +592,9 @@ alertmanager/
 | Nginx como SPOF | Baixa | Alto | Health checks, múltiplas instâncias |
 | UI desatualizada | Média | Baixo | Manter APIs como fonte da verdade |
 | Testes de performance lentos | Alta | Médio | Executar sob demanda, não no CI |
+| Backend sem endpoints para telas | Alta | Alto | Implementar endpoints em paralelo com frontend (Fase 3.1) |
+| Frontend sem testes E2E | Alta | Médio | Adicionar Playwright/Cypress na Fase 4 |
+| Sem lib de gráficos no dashboard | Média | Baixo | Avaliar Recharts ou Chart.js (leve e open-source) |
 
 ---
 
@@ -589,11 +618,22 @@ Para cada item deste plano ser considerado completo:
 |------|-------|-----------------|--------|
 | Fase 1 - Fundação | Nginx, Cache | 20-28h | ✅ Concluída |
 | Fase 2 - Observabilidade | Grafana, Gatling | 22-30h | ⏳ Pendente |
-| Fase 3 - Frontend | Dashboard UI | 40-60h | ✅ Concluída |
+| Fase 3 - Frontend MVP | Dashboard UI (4 telas) | 40-60h | ✅ Concluída |
+| Fase 3.1 - Frontend Gestão | Backend endpoints (14) + 5 telas + melhorias | 38-56h | ⏳ Pendente |
 | Fase 4 - Qualidade | Testes de Contrato | 8-10h | ⏳ Pendente |
 | **Total Concluído** | | **~56-72h** | |
-| **Total Restante** | | **~34-46h** | |
-| **Total Geral** | | **~100-128h** | |
+| **Total Restante** | | **~72-102h** | |
+| **Total Geral** | | **~134-180h** | |
+
+#### Detalhamento Fase 3.1 (Frontend Gestão)
+
+| Item | Backend Endpoints | Frontend Tela | Horas |
+|------|-------------------|---------------|-------|
+| Gestão de Usuários | 4 endpoints | 1 tela (CRUD) | 8-12h |
+| Detalhe do Evento + Lotes | 4 endpoints | 1 tela (detalhe + CRUD lotes) | 12-16h |
+| Gestão de Reservas | 3 endpoints | 1 tela (listagem + filtros) | 8-12h |
+| Histórico de Pagamentos | 2 endpoints | 1 tela (listagem + detalhes) | 6-10h |
+| Dashboard com Filtros/Gráficos | — (backend pronto) | Melhorias + lib gráficos | 4-6h |
 
 ---
 
@@ -621,3 +661,4 @@ Para dúvidas sobre este plano, consulte a documentação do projeto ou abra uma
 | 29/03/2026 | 1.0 | Criação inicial do plano |
 | 29/03/2026 | 1.1 | Atualização com decisões arquiteturais validadas (Nginx + Docker Swarm, Cache-aside, SPA React, Gatling, Contratos mínimos, Apenas Retry, Alertas por e-mail) |
 | 10/04/2026 | 1.2 | Fases 1 e 3 concluídas: Nginx + auto-scaling, Cache Redis, Dashboard UI (React + Vite). Roadmap e carga horária atualizados. |
+| 10/04/2026 | 1.3 | GAP analysis do frontend: 4 telas novas identificadas (Usuários, Lotes, Reservas, Pagamentos), melhorias no Dashboard, 14 endpoints backend faltantes. Fase 3.1 criada. Carga horária recalculada (~134-180h total). |
