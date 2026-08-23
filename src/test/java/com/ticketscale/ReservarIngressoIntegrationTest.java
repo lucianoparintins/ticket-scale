@@ -1,5 +1,6 @@
 package com.ticketscale;
 
+import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.application.port.out.LockManager;
 import com.ticketscale.application.usecase.ReservarIngressoUseCase;
 import com.ticketscale.domain.evento.Evento;
@@ -35,6 +36,9 @@ public class ReservarIngressoIntegrationTest {
     // de orquestração interna e persistência multi-tabelas H2
     @MockitoBean
     private LockManager lockManager;
+
+    @MockitoBean
+    private EventPublisher eventPublisher;
 
     @Autowired(required = false)
     private IngressoRepository ingressoRepository;

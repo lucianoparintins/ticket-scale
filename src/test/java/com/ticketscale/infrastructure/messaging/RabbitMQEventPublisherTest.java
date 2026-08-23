@@ -41,7 +41,7 @@ class RabbitMQEventPublisherTest {
 
         verify(rabbitTemplate).convertAndSend(
                 RabbitMQConfig.EXCHANGE_TICKETSCALE_EVENTS,
-                RabbitMQConfig.ROUTING_KEY_RESERVA_EXPIRACAO,
+                RabbitMQConfig.ROUTING_KEY_RESERVA_EXPIRACAO_DELAY,
                 evento
         );
     }

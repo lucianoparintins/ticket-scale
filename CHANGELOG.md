@@ -7,6 +7,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Adicionado
+- **Expiração Automática de Reservas (TTL nativo + Dead Letter Queue + Fallback Scheduler):**
+  - Evento de domínio `ReservaExpiradaEvent` publicado quando uma reserva pendente expira.
+  - Método `buscarReservasExpiradas` no `ReservaRepository` com consulta JPQL indexada por status `PENDENTE` e `dataExpiracao`.
+  - Use case dedicado `ExpirarReservaUseCase` com controle de concorrência via lock distribuído Redis (`lock:pagamento:reserva:{id}`), cancelamento da reserva, liberação do ingresso para `LIVRE`, publicação de evento de domínio e invalidação de cache de eventos.
+  - Configuração no `RabbitMQConfig` de fila de delay `ticketscale.reservations.expiration.delay` com `x-message-ttl` de 5 minutos roteando via Dead Letter para `ticketscale.reservations.expiration`.
+  - `ExpiracaoReservaListener` integrado ao `ExpirarReservaUseCase` para processamento orientado a eventos.
+  - Disparo de evento de expiração automática em `ReservarIngressoUseCase` no momento da criação da reserva.
+  - `ExpiracaoReservaScheduler` (`@Scheduled` a cada 2 minutos) como mecanismo resiliente de fallback contra quedas transitórias do broker.
+  - Habilitação de `@EnableScheduling` na classe principal `TicketScaleApplication`.
+  - Testes automatizados unitários (`ExpirarReservaUseCaseTest`, `ExpiracaoReservaSchedulerTest`, `ExpiracaoReservaListenerTest`, `ReservarIngressoUseCaseTest`) e teste de integração end-to-end com H2 (`ExpirarReservaIntegrationTest`).
 - **Cache de Leitura com Redis (Política Cache-aside):**
   - Interface `CacheManager` na camada de aplicação para desacoplamento.
   - Implementação `RedisCacheManagerImpl` na infraestrutura usando Spring Cache (`@Cacheable`, `@CacheEvict`).
@@ -65,7 +75,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Mensageria (RabbitMQ)
 - `EventPublisher` e `RabbitMQEventPublisher`.
-- Eventos: `ReservaCriadaEvent`, `PagamentoConfirmadoEvent`.
+- Eventos: `ReservaCriadaEvent`, `PagamentoConfirmadoEvent`, `ReservaExpiradaEvent`.
 - Listeners: `ExpiracaoReservaListener`, `NotificacaoListener`, `CacheInvalidationListener`.
 
 ### Dashboard — APIs

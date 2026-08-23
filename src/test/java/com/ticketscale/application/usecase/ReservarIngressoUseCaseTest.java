@@ -1,12 +1,14 @@
 package com.ticketscale.application.usecase;
 
+import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.application.port.out.LockManager;
+import com.ticketscale.domain.event.ReservaCriadaEvent;
 import com.ticketscale.domain.evento.Evento;
 import com.ticketscale.domain.evento.PeriodoEvento;
 import com.ticketscale.domain.reserva.*;
+import com.ticketscale.domain.usuario.Papel;
 import com.ticketscale.domain.usuario.Usuario;
 import com.ticketscale.domain.usuario.UsuarioRepository;
-import com.ticketscale.domain.usuario.Papel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,11 +43,15 @@ class ReservarIngressoUseCaseTest {
     @Mock
     private LockManager lockManager;
 
+    @Mock
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private ReservarIngressoUseCase useCase;
 
     private UUID loteId;
     private UUID usuarioId;
+    private UUID reservaId;
     private Lote lote;
     private Usuario usuario;
     private Ingresso ingressoLivre;
@@ -54,6 +60,7 @@ class ReservarIngressoUseCaseTest {
     void setUp() {
         loteId = UUID.randomUUID();
         usuarioId = UUID.randomUUID();
+        reservaId = UUID.randomUUID();
         
         Evento evento = Evento.builder()
                 .id(UUID.randomUUID())
@@ -84,7 +91,12 @@ class ReservarIngressoUseCaseTest {
         when(ingressoRepository.findFirstByLoteIdAndStatus(loteId, StatusIngresso.LIVRE)).thenReturn(Optional.of(ingressoLivre));
         when(usuarioRepository.buscarPorId(usuarioId)).thenReturn(Optional.of(usuario));
         
-        Reserva reservaMock = new Reserva(usuario, ingressoLivre);
+        Reserva reservaMock = Reserva.builder()
+                .id(reservaId)
+                .usuario(usuario)
+                .ingresso(ingressoLivre)
+                .status(StatusReserva.PENDENTE)
+                .build();
         when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaMock);
 
         Reserva reservaSalva = useCase.executar(loteId, usuarioId);
@@ -93,6 +105,8 @@ class ReservarIngressoUseCaseTest {
         assertEquals(StatusIngresso.RESERVADO, ingressoLivre.getStatus());
         verify(ingressoRepository).save(ingressoLivre);
         verify(reservaRepository).save(any(Reserva.class));
+        verify(eventPublisher).publicarReservaCriada(any(ReservaCriadaEvent.class));
+        verify(eventPublisher).publicarReservaExpiracao(any(ReservaCriadaEvent.class));
         verify(lockManager).releaseLock("lock:reserva:lote:" + loteId);
     }
 
@@ -105,6 +119,8 @@ class ReservarIngressoUseCaseTest {
 
         verify(loteRepository, never()).findById(any());
         verify(lockManager, never()).releaseLock(any());
+        verify(eventPublisher, never()).publicarReservaCriada(any());
+        verify(eventPublisher, never()).publicarReservaExpiracao(any());
     }
 
     @Test
@@ -118,5 +134,7 @@ class ReservarIngressoUseCaseTest {
 
         verify(lockManager).releaseLock("lock:reserva:lote:" + loteId);
         verify(reservaRepository, never()).save(any());
+        verify(eventPublisher, never()).publicarReservaCriada(any());
+        verify(eventPublisher, never()).publicarReservaExpiracao(any());
     }
 }

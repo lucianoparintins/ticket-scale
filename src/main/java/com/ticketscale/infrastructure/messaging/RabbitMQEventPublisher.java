@@ -4,6 +4,7 @@ import com.ticketscale.application.port.out.EventPublisher;
 import com.ticketscale.domain.event.CacheInvalidadoEvent;
 import com.ticketscale.domain.event.PagamentoConfirmadoEvent;
 import com.ticketscale.domain.event.ReservaCriadaEvent;
+import com.ticketscale.domain.event.ReservaExpiradaEvent;
 import com.ticketscale.infrastructure.config.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
@@ -30,9 +31,14 @@ public class RabbitMQEventPublisher implements EventPublisher {
     public void publicarReservaExpiracao(ReservaCriadaEvent evento) {
         rabbitTemplate.convertAndSend(
             RabbitMQConfig.EXCHANGE_TICKETSCALE_EVENTS,
-            RabbitMQConfig.ROUTING_KEY_RESERVA_EXPIRACAO,
+            RabbitMQConfig.ROUTING_KEY_RESERVA_EXPIRACAO_DELAY,
             evento
         );
+    }
+
+    @Override
+    public void publicarReservaExpirada(ReservaExpiradaEvent evento) {
+        // Reservado para futuras filas de notificação / auditoria de expiração
     }
 
     @Override
