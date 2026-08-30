@@ -233,6 +233,7 @@ O projeto possui um conjunto de ferramentas para garantir qualidade do código:
 | Ferramenta | Finalidade | Comando |
 |------------|------------|---------|
 | **JaCoCo** | Cobertura de testes | `./gradlew jacocoTestReport` |
+| **Gatling** | Testes de carga e performance | `./scripts/run-performance-tests.sh` ou `./gradlew gatlingRun` |
 | **Checkstyle** | Padronização de código | `./gradlew checkstyleMain checkstyleTest` |
 | **PMD** | Detecção de bugs e más práticas | `./gradlew pmdMain pmdTest` |
 | **OWASP Dependency Check** | Segurança de dependências | `./gradlew dependencyCheckAnalyze` |
@@ -251,9 +252,26 @@ O projeto possui um conjunto de ferramentas para garantir qualidade do código:
 ### Relatórios
 
 - **Cobertura de testes:** `build/reports/jacoco/test/html/index.html`
+- **Gatling (Performance):** `build/reports/gatling/`
 - **Checkstyle:** `build/reports/checkstyle/main.html` e `build/reports/checkstyle/test.html`
 - **PMD:** `build/reports/pmd/main.html` e `build/reports/pmd/test.html`
 - **OWASP:** `build/reports/dependency-check-report.html`
+
+### Testes de Performance (Gatling)
+
+Execute os testes de carga e estresse:
+
+```bash
+# Executar todos os testes com perfil padrão (smoke)
+./scripts/run-performance-tests.sh
+
+# Executar cenário específico com parâmetros customizados
+BASE_URL="http://localhost:8080" USERS=100 PROFILE=load SIMULATION=reserva ./scripts/run-performance-tests.sh
+
+# Execução direta via Gradle
+./gradlew gatlingRun
+./gradlew gatlingRun-com.ticketscale.performance.ReservaConcorrenteSimulation -Dusers=100
+```
 
 ### Script de Automação
 
@@ -396,9 +414,9 @@ docker compose stop sonarqube
 - [x] Nginx Load Balancer com auto-scaling (Docker Swarm)
 - [x] Cache de leitura com Redis (política Cache-aside)
 - [x] Testcontainers para testes de integração com PostgreSQL real
+- [x] Testes de performance e carga com Gatling (Java DSL)
 
 ### Pendente
-- [ ] Testes de performance (Gatling)
 - [ ] Testes de contrato (Spring Cloud Contract — escopo mínimo)
 - [ ] Retry automático para falhas transitórias (Spring Retry)
 - [ ] Métricas e alertas (Grafana + Alertmanager por e-mail)

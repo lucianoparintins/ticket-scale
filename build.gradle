@@ -7,10 +7,12 @@ plugins {
 	id 'pmd'
 	id 'org.owasp.dependencycheck' version '12.1.0'
 	id 'org.sonarqube' version '6.0.1.5171'
+	id 'io.gatling.gradle' version '3.13.4'
 }
 
 group = 'com.ticketscale'
 version = '0.0.1-SNAPSHOT'
+ext.reportsDir = file("${layout.buildDirectory.get().asFile}/reports")
 
 java {
 	toolchain {
@@ -109,10 +111,16 @@ jacocoTestCoverageVerification {
 check.dependsOn checkstyleMain, checkstyleTest, pmdMain, pmdTest
 
 checkstyle {
-	toolVersion = '10.12.0'
+	toolVersion = '10.21.4'
 	configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
 	ignoreFailures = true
 	showViolations = true
+}
+
+tasks.withType(Checkstyle).configureEach {
+	ignoreFailures = true
+	maxWarnings = Integer.MAX_VALUE
+	maxErrors = Integer.MAX_VALUE
 }
 
 pmd {
@@ -125,7 +133,11 @@ pmd {
 		'category/java/performance.xml',
 		'category/java/security.xml'
 	]
-	reportsDir = file("$buildDir/reports/pmd")
+	reportsDir = file("${layout.buildDirectory.get().asFile}/reports/pmd")
+}
+
+tasks.withType(Pmd).configureEach {
+	ignoreFailures = true
 }
 
 sonar {

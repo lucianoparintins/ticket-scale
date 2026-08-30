@@ -13,7 +13,12 @@ public record DadosRelatorioReceita(
     BigDecimal valorTotal
 ) {
     public DadosRelatorioReceita(RelatorioReceita relatorio) {
-        BigDecimal total = relatorio.total() != null ? relatorio.total() : BigDecimal.ZERO;
-        this(total, relatorio.quantidadeVendas(), relatorio.periodoInicio(), relatorio.periodoFim(), total);
+        this(
+            relatorio.total() != null ? relatorio.total() : BigDecimal.ZERO,
+            relatorio.quantidadeVendas(),
+            relatorio.periodoInicio(),
+            relatorio.periodoFim(),
+            relatorio.total() != null ? relatorio.total() : BigDecimal.ZERO
+        );
     }
 }

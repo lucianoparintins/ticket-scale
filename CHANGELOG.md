@@ -7,6 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Adicionado
+- **Testes de Performance e Carga (Gatling com Java DSL):**
+  - Integração do plugin `io.gatling.gradle` e configuração de compatibilidade com Gradle 9 e Java 25.
+  - Estrutura completa de simulações em `src/gatling/java/com/ticketscale/performance/`:
+    - `ConfiguracaoPerformance`: utilitário com parametrização dinâmica via System Properties (`baseUrl`, `users`, `rampDuration`, `testDuration`, `profile`) e helpers de autenticação/cabeçalhos.
+    - `AutenticacaoSimulation`: teste de throughput e latência do endpoint de login (`POST /api/login`) com hashing Argon2id.
+    - `ConsultaEventosSimulation`: validação de latência em endpoints de catálogo e eficiência do cache Redis (`GET /api/eventos`).
+    - `ReservaConcorrenteSimulation`: teste de alta disputa de concorrência no mesmo lote (`POST /api/v1/reservas`), validando o lock distribuído Redis e prevenção de *overselling*.
+    - `CheckoutCompletoSimulation`: simulação End-to-End do fluxo de compra (Login $\rightarrow$ Consulta $\rightarrow$ Reserva $\rightarrow$ Pagamento PIX).
+  - Massa de dados com feeders CSV em `src/gatling/resources/data/` (`usuarios.csv`, `eventos.csv`).
+  - Script de automação e execução `scripts/run-performance-tests.sh` para facilitar testes locais e em pipelines.
+  - Documentação da especificação técnica em `spec/2026-08-30_17-04-36_testes-performance-gatling.md`.
 - **Expiração Automática de Reservas (TTL nativo + Dead Letter Queue + Fallback Scheduler):**
   - Evento de domínio `ReservaExpiradaEvent` publicado quando uma reserva pendente expira.
   - Método `buscarReservasExpiradas` no `ReservaRepository` com consulta JPQL indexada por status `PENDENTE` e `dataExpiracao`.

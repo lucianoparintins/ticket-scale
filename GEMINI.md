@@ -30,6 +30,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 - **Run API:** `./gradlew bootRun`
 - **Tests:** `./gradlew test`
 - **Cobertura de Testes:** `./gradlew jacocoTestReport` (relatório em `build/reports/jacoco/test/html/`)
+- **Testes de Performance (Gatling):** `./scripts/run-performance-tests.sh` ou `./gradlew gatlingRun` (relatórios em `build/reports/gatling/`)
 - **Checkstyle:** `./gradlew checkstyleMain checkstyleTest`
 - **PMD:** `./gradlew pmdMain pmdTest`
 - **Script de Qualidade:** `./scripts/quality-reports.sh`
@@ -147,11 +148,13 @@ export PATH=$JAVA_HOME/bin:$PATH
 - `config/pmd/ruleset.xml`: Regras de análise PMD.
 - `docs/plano_implementacao_pendencias.md`: Plano detalhado de pendências e progresso.
 - `scripts/quality-reports.sh`: Script de automação de relatórios de qualidade.
+- `scripts/run-performance-tests.sh`: Script de execução automatizada de testes de performance (Gatling).
 - `scripts/auto-scale.sh`: Script de auto-scaling baseado em CPU/Memory (Docker Swarm).
 - `scripts/dev-up-local.sh`: Script para subir ambiente local rapidamente.
 - `nginx/`: Configurações do Nginx (load balancer + reverse proxy + static files).
 - `frontend/`: SPA React + TypeScript + Vite (código fonte do dashboard admin).
 - `src/main/resources/static/admin/`: Build final do frontend (servida pelo Spring Boot).
+- `src/gatling/`: Testes de performance, carga e estresse com Gatling (Java DSL) e massa de dados.
 - `src/main/java/com/ticketscale/`: Root package com as camadas:
     - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`, `Pagamento`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`, `StatusPagamento`, `MetodoPagamento`), sealed interface (`DadosMetodoPagamento`), eventos de domínio (`ReservaCriadaEvent`, `PagamentoConfirmadoEvent`, `CacheInvalidadoEvent`), **dashboard** (`MetricaVendas`, `RelatorioReceita`, `MetricasDashboard`), repositórios e `PasswordHasher`.
     - `application/`: Casos de uso (`ReservarIngressoUseCase`, `ProcessarPagamentoUseCase`, `GerarRelatorioVendasPorEvento`, `CalcularReceitaTotal`, `ObterMetricasDashboard`), serviços (`EventoService`, `AutenticacaoService`, `LoteService`), portas (`LockManager`, `CacheManager`, `EventPublisher`, `GatewayPagamento`, `GatewayPagamentoResolver`).

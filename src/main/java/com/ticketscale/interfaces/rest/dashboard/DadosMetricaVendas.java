@@ -15,15 +15,14 @@ public record DadosMetricaVendas(
     BigDecimal valorTotal
 ) {
     public DadosMetricaVendas(MetricaVendas metrica) {
-        BigDecimal receita = metrica.receitaTotal() != null ? metrica.receitaTotal() : BigDecimal.ZERO;
         this(
                 metrica.eventoId(),
                 metrica.eventoNome(),
                 metrica.ingressosVendidos(),
-                receita,
+                metrica.receitaTotal() != null ? metrica.receitaTotal() : BigDecimal.ZERO,
                 metrica.eventoNome(),
                 metrica.ingressosVendidos(),
-                receita
+                metrica.receitaTotal() != null ? metrica.receitaTotal() : BigDecimal.ZERO
         );
     }
 }

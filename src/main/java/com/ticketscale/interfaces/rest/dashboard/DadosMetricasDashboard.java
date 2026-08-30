@@ -15,17 +15,16 @@ public record DadosMetricasDashboard(
     double ticketMedio
 ) {
     public DadosMetricasDashboard(MetricasDashboard metricas) {
-        BigDecimal receita = metricas.receitaTotal() != null ? metricas.receitaTotal() : BigDecimal.ZERO;
-        long vendas = metricas.ingressosVendidos();
-        double ticketMedio = vendas > 0 ? receita.doubleValue() / vendas : 0.0;
         this(
-            receita,
+            metricas.receitaTotal() != null ? metricas.receitaTotal() : BigDecimal.ZERO,
             metricas.ingressosVendidos(),
             metricas.vendasPorEvento().stream().map(DadosMetricaVendas::new).toList(),
             metricas.taxaConversao(),
-            vendas,
+            metricas.ingressosVendidos(),
             0L,
-            ticketMedio
+            metricas.ingressosVendidos() > 0 && metricas.receitaTotal() != null
+                ? metricas.receitaTotal().doubleValue() / metricas.ingressosVendidos()
+                : 0.0
         );
     }
 }
