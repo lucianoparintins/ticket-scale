@@ -1,0 +1,12 @@
+name: criar-reserva-payload-invalido
+description: "Deve retornar 400 Bad Request ao enviar payload inválido para reserva"
+request:
+  method: POST
+  url: /api/v1/reservas
+  headers:
+    Content-Type: application/json
+  body:
+    loteId: null
+    usuarioId: null
+response:
+  status: 400

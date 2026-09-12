@@ -380,28 +380,30 @@ Listado como pendente no README. Importante para validar integração entre serv
 - Validar abordagem antes de expandir
 
 #### 5.2 Implementação
-- [ ] Adicionar `spring-cloud-contract` no build.gradle
-- [ ] Definir contratos em Groovy DSL
-- [ ] Gerar stubs para consumidores
-- [ ] Testes de producer (verificar contrato)
-- [ ] Testes de consumer (usar stubs)
+- [x] Adicionar `spring-cloud-contract` no build.gradle
+- [x] Definir contratos em YAML DSL
+- [x] Gerar stubs para consumidores
+- [x] Testes de producer (verificar contrato)
+- [x] Testes de consumer (usar stubs)
 
-### Arquivos a Criar
+### Arquivos Criados
 
 ```
-src/test/resources/contracts/
+src/contractTest/resources/contracts/
 ├── autenticacao/
-│   └── login.groovy
-└── reservas/
-    └── criarReserva.groovy
+│   ├── login-sucesso.yml
+│   └── login-credenciais-invalidas.yml
+└── reserva/
+    ├── criar-reserva-sucesso.yml
+    └── criar-reserva-payload-invalido.yml
 ```
 
 ### Critérios de Aceite
 
-- [ ] Contratos definidos para endpoints principais
-- [ ] Stubs gerados e publicados
-- [ ] Testes de contrato passam no CI
-- [ ] Documentação de como usar stubs
+- [x] Contratos definidos para endpoints principais
+- [x] Stubs gerados e publicados
+- [x] Testes de contrato passam no CI
+- [x] Documentação de como usar stubs
 
 ### Estimativa
 - **Tempo:** 8-10 horas
@@ -572,7 +574,7 @@ alertmanager/
 10. [ ] Dashboard com Filtros e Gráficos
 
 ### Fase 4 - Qualidade ⏳ **Pendente**
-11. [ ] Testes de Contrato (Spring Cloud Contract — escopo mínimo)
+11. [x] Testes de Contrato (Spring Cloud Contract — escopo mínimo)
 
 ### Dependências: Backend Necessário para Telas de Gestão
 

@@ -1,0 +1,16 @@
+name: login-credenciais-invalidas
+description: "Deve retornar 401 quando as credenciais forem incorretas"
+request:
+  method: POST
+  url: /api/login
+  headers:
+    Content-Type: application/json
+  body:
+    login: "usuario.teste"
+    senha: "senhaIncorreta"
+response:
+  status: 401
+  headers:
+    Content-Type: application/json
+  body:
+    mensagem: "Bad credentials"

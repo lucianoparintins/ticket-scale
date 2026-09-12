@@ -1,0 +1,29 @@
+name: login-sucesso
+description: "Deve autenticar com sucesso e retornar token JWT"
+request:
+  method: POST
+  url: /api/login
+  headers:
+    Content-Type: application/json
+  body:
+    login: "usuario.teste"
+    senha: "senhaValida123"
+  matchers:
+    body:
+      - path: $.login
+        type: by_regex
+        value: "[a-zA-Z0-9._-]+"
+      - path: $.senha
+        type: by_regex
+        value: ".+"
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    token: "token_jwt_valido"
+  matchers:
+    body:
+      - path: $.token
+        type: by_regex
+        value: ".+"

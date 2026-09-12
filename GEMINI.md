@@ -28,7 +28,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 - **Infraestrutura:** `docker compose up -d` (PostgreSQL, Redis, RabbitMQ)
 - **Build:** `./gradlew build`
 - **Run API:** `./gradlew bootRun`
-- **Tests:** `./gradlew test`
+- **Tests:** `./gradlew test` (inclui automaticamente contractTest, stubs e testes unitários/integrados)
+- **Testes de Contrato (Provider):** `./gradlew contractTest` (relatório em `build/reports/tests/contractTest/`)
+- **Stubs WireMock (Consumer):** `./gradlew generateClientStubs` e `./gradlew verifierStubsJar`
 - **Cobertura de Testes:** `./gradlew jacocoTestReport` (relatório em `build/reports/jacoco/test/html/`)
 - **Testes de Performance (Gatling):** `./scripts/run-performance-tests.sh` ou `./gradlew gatlingRun` (relatórios em `build/reports/gatling/`)
 - **Checkstyle:** `./gradlew checkstyleMain checkstyleTest`
@@ -106,6 +108,7 @@ export PATH=$JAVA_HOME/bin:$PATH
           }
       }
       ```
+    - **Contrato (Spring Cloud Contract):** Definidos em YAML DSL sob `src/contractTest/resources/contracts/`. As classes base do provider utilizam `RestAssuredMockMvc.standaloneSetup(controller)` com mocks rápidos e isolados do Mockito. Os testes do consumidor utilizam `@AutoConfigureStubRunner(ids = "com.ticketscale:ticketscale:+:stubs", stubsMode = StubRunnerProperties.StubsMode.CLASSPATH)`.
     - **Injeção de Mocks:** Utilize `@MockitoBean` em vez de `@MockBean` para compatibilidade com as versões mais recentes do Spring Boot.
 - **Módulo de Pagamento:**
     - Utilize o **Strategy Pattern** via `GatewayPagamentoResolver` para gerenciar diferentes métodos de pagamento.
@@ -154,6 +157,8 @@ export PATH=$JAVA_HOME/bin:$PATH
 - `nginx/`: Configurações do Nginx (load balancer + reverse proxy + static files).
 - `frontend/`: SPA React + TypeScript + Vite (código fonte do dashboard admin).
 - `src/main/resources/static/admin/`: Build final do frontend (servida pelo Spring Boot).
+- `spec/`: Especificações técnicas e planos arquiteturais detalhados de novas funcionalidades.
+- `src/contractTest/resources/contracts/`: Contratos de API em YAML DSL para Spring Cloud Contract (`autenticacao/`, `reserva/`).
 - `src/gatling/`: Testes de performance, carga e estresse com Gatling (Java DSL) e massa de dados.
 - `src/main/java/com/ticketscale/`: Root package com as camadas:
     - `domain/`: Entidades (`Usuario`, `Evento`, `Ingresso`, `Lote`, `Reserva`, `Pagamento`), value objects (`PeriodoEvento`), enums (`StatusIngresso`, `StatusReserva`, `StatusPagamento`, `MetodoPagamento`), sealed interface (`DadosMetodoPagamento`), eventos de domínio (`ReservaCriadaEvent`, `PagamentoConfirmadoEvent`, `CacheInvalidadoEvent`), **dashboard** (`MetricaVendas`, `RelatorioReceita`, `MetricasDashboard`), repositórios e `PasswordHasher`.

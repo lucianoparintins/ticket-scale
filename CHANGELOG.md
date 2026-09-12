@@ -7,6 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Adicionado
+- **Testes de Contrato (Spring Cloud Contract com YAML DSL — Escopo Mínimo):**
+  - Integração do plugin `org.springframework.cloud.contract:4.3.0` no Gradle e configuração da task `contractTest`.
+  - Contratos declarativos em YAML DSL sob `src/contractTest/resources/contracts/`:
+    - Autenticação (`POST /api/login`): fluxo de sucesso (`login-sucesso.yml`) e credenciais inválidas (`login-credenciais-invalidas.yml`).
+    - Reserva de Ingressos (`POST /api/v1/reservas`): fluxo de sucesso (`criar-reserva-sucesso.yml`) e payload inválido (`criar-reserva-payload-invalido.yml`).
+  - Classes base do Provider (`AutenticacaoBase` e `ReservaBase`) isolando controllers com MockMvc standalone e mocks leves do Mockito.
+  - `SpringCompatibilityPatcher` com ASM MethodVisitor em tempo de execução para garantir compatibilidade binária contínua entre `io.rest-assured:spring-mock-mvc` e `MockHttpServletRequestBuilder` no Spring Framework 7 / Spring Boot 4.
+  - Geração automatizada de stubs WireMock (`generateClientStubs` e `verifierStubsJar`), disponibilizando mappings JSON em `build/stubs/` e `ticketscale-0.0.1-SNAPSHOT-stubs.jar`.
+  - Teste automatizado de integração do consumidor `TicketScaleConsumerContractTest` com `@AutoConfigureStubRunner` (modo CLASSPATH) e `RestClient`.
+  - Execução dos testes de contrato e geração de stubs integrada à task `./gradlew test` e relatórios HTML.
+  - Especificação técnica registrada em `spec/2026-09-12_07-48-13_testes-contrato-spring-cloud-contract.md`.
 - **Testes de Performance e Carga (Gatling com Java DSL):**
   - Integração do plugin `io.gatling.gradle` e configuração de compatibilidade com Gradle 9 e Java 25.
   - Estrutura completa de simulações em `src/gatling/java/com/ticketscale/performance/`:

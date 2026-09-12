@@ -252,10 +252,31 @@ O projeto possui um conjunto de ferramentas para garantir qualidade do código:
 ### Relatórios
 
 - **Cobertura de testes:** `build/reports/jacoco/test/html/index.html`
+- **Testes de Contrato:** `build/reports/tests/contractTest/index.html`
 - **Gatling (Performance):** `build/reports/gatling/`
 - **Checkstyle:** `build/reports/checkstyle/main.html` e `build/reports/checkstyle/test.html`
 - **PMD:** `build/reports/pmd/main.html` e `build/reports/pmd/test.html`
 - **OWASP:** `build/reports/dependency-check-report.html`
+
+### Testes de Contrato (Spring Cloud Contract)
+
+O projeto adota *Consumer-Driven Contracts* (CDC) com **Spring Cloud Contract** e formato **YAML DSL** para prevenção de *breaking changes* nos endpoints críticos (`/api/login` e `/api/v1/reservas`).
+
+```bash
+# Executar apenas testes de contrato do provider
+./gradlew contractTest
+
+# Gerar mappings e stubs WireMock para consumidores
+./gradlew generateClientStubs
+
+# Empacotar stubs em JAR (build/libs/ticketscale-*-stubs.jar)
+./gradlew verifierStubsJar
+
+# Executar suíte completa (inclui contractTest e testes de consumidor com StubRunner)
+./gradlew test
+```
+
+Os stubs WireMock gerados ficam disponíveis em `build/stubs/` e podem ser consumidos diretamente pelo frontend SPA (`src/main/resources/static/admin/`) ou testes de integração com `@AutoConfigureStubRunner`.
 
 ### Testes de Performance (Gatling)
 
@@ -415,9 +436,9 @@ docker compose stop sonarqube
 - [x] Cache de leitura com Redis (política Cache-aside)
 - [x] Testcontainers para testes de integração com PostgreSQL real
 - [x] Testes de performance e carga com Gatling (Java DSL)
+- [x] Testes de contrato (Spring Cloud Contract — escopo mínimo para Autenticação e Reservas com stubs WireMock)
 
 ### Pendente
-- [ ] Testes de contrato (Spring Cloud Contract — escopo mínimo)
 - [ ] Retry automático para falhas transitórias (Spring Retry)
 - [ ] Métricas e alertas (Grafana + Alertmanager por e-mail)
 - [ ] Gestão de ingressos e preços pela UI (página de Ingressos)
